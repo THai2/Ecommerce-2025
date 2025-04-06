@@ -70,11 +70,10 @@ export function useProductBySlug(slug: string) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${baseUrl}/api/products?slug=${slug}`, {
+        const res = await fetch(`/api/products?slug=${slug}`, {
           cache: 'no-store',
         });
         if (!res.ok) throw new Error('Failed to fetch product');
@@ -113,12 +112,11 @@ export function useRelatedProductsByCategory({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
     const fetchRelatedProducts = async () => {
       try {
         setLoading(true);
         const res = await fetch(
-          `${baseUrl}/api/products?category=${category}&productId=${productId}&limit=${limit}&page=${page}`,
+          `/api/products?category=${category}&productId=${productId}&limit=${limit}&page=${page}`,
           { cache: 'no-store' }
         );
         if (!res.ok) throw new Error('Failed to fetch related products');

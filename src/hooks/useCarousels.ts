@@ -7,11 +7,10 @@ export function useCarousels() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
     const fetchCarousels = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${baseUrl}/api/carousels`, { cache: 'no-store' });
+        const res = await fetch(`/api/carousels`, { cache: 'no-store' });
         if (!res.ok) throw new Error('Failed to fetch carousels');
         const data = await res.json();
         setCarousels(data);
