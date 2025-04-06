@@ -10,6 +10,10 @@ import Rating from '@/components/shared/product/rating';
 import SelectVariant from '@/components/shared/product/selectVariant';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import BrowsingHistoryList from '@/components/shared/browsing-history-list';
+import AddToBrowsingHistory from '@/components/shared/product/add-to-browsing-history';
+import AddToCart from '@/components/shared/product/addToCart';
+import { generateId, round2 } from '@/lib/utils';
 
 export default function ProductDetails() {
   const params = useParams();
@@ -43,6 +47,8 @@ export default function ProductDetails() {
         <title>{metadata.title}</title>
         <meta name="description" content={metadata.description || ''} />
       </Head>
+
+      <AddToBrowsingHistory id={product._id} category={product.category} />
 
       <div>
         <section>
@@ -100,9 +106,29 @@ export default function ProductDetails() {
                     <div className="text-green-700 text-xl">In Stock</div>
                   ) : (
                     <div className="text-destructive text-xl">Out of Stock</div>
+                  )} {product.countInStock !== 0 && (
+                    <div className='flex justify-center items-center'>
+                      <AddToCart
+                        item={{
+                          clientId: generateId(),
+                          product: product._id,
+                          countInStock: product.countInStock,
+                          name: product.name,
+                          slug: product.slug,
+                          category: product.category,
+                          price: round2(product.price),
+                          quantity: 1,
+                          image: product.images[0],
+                          size: size || product.sizes[0],
+                          color: color || product.colors[0],
+                        }}
+                      />
+                    </div>
                   )}
                 </CardContent>
               </Card>
+
+             
             </div>
           </div>
         </section>
@@ -119,6 +145,11 @@ export default function ProductDetails() {
             />
           )}
         </section>
+
+        <section>
+          <BrowsingHistoryList className='mt-10' />
+        </section>
+
       </div>
     </>
   );

@@ -7,6 +7,7 @@ import { toSlug } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import ProductSlider from '@/components/shared/product/productSlider';
 import { Loader2, AlertCircle } from 'lucide-react';
+import BrowsingHistoryList from '@/components/shared/browsing-history-list';
 
 // Component for loading state
 const LoadingState = ({ message = 'Loading data...' }) => (
@@ -151,46 +152,72 @@ export default function HomePage() {
 
   return (
     <>
-      {carouselsLoading ? (
-        <CarouselSkeleton />
-      ) : carouselsError ? (
-        <div className="p-4">
-          <ErrorState message="Failed to load promotional banners." />
-        </div>
-      ) : (
-        <HomeCarousel items={carouselItems} />
-      )}
-
-      <div className="md:p-4 md:space-y-4 bg-border">
+      <div className="bg-gray-50">
+        {carouselsLoading ? (
+          <CarouselSkeleton />
+        ) : carouselsError ? (
+          <Card className="mx-auto max-w-7xl mt-4">
+            <CardContent className="min-h-[200px] flex items-center justify-center">
+              <ErrorState message="Failed to load promotional banners" />
+            </CardContent>
+          </Card>
+        ) : (
+          <HomeCarousel items={carouselItems} />
+        )}
+      </div>
+  
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 lg:space-y-12">
         <HomeCard cards={cards} />
-
-        <Card className="w-full rounded-none">
-          <CardContent className="p-4 items-center gap-3">
+  
+        {/* Today's Deals Section */}
+        <Card className="rounded-lg shadow-sm overflow-hidden">
+          <CardContent className="p-4 md:p-6">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Todays Deals</h2>
+              <p className="text-gray-500 mt-1">Dont miss out on these limited offers</p>
+            </div>
             {todaysDealsLoading ? (
-              <LoadingState message="Loading Today's Deals..." />
+              <div className="min-h-[300px] flex items-center justify-center">
+                <LoadingState message="Loading Today's Deals..." />
+              </div>
             ) : todaysDealsError ? (
-              <ErrorState message="Failed to load Today's Deals." />
+              <div className="min-h-[300px] flex items-center justify-center">
+                <ErrorState message="Failed to load Today's Deals" />
+              </div>
             ) : (
-              <ProductSlider title={"Today's Deals"} products={todaysDeals} />
+              <ProductSlider products={todaysDeals} />
             )}
           </CardContent>
         </Card>
-
-        <Card className="w-full rounded-none">
-          <CardContent className="p-4 items-center gap-3">
+  
+        {/* Best Selling Section */}
+        <Card className="rounded-lg shadow-sm overflow-hidden">
+          <CardContent className="p-4 md:p-6">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Best Sellers</h2>
+              <p className="text-gray-500 mt-1">Most popular products this week</p>
+            </div>
             {bestSellingLoading ? (
-              <LoadingState message="Loading Best Selling Products..." />
+              <div className="min-h-[300px] flex items-center justify-center">
+                <LoadingState message="Loading Best Sellers..." />
+              </div>
             ) : bestSellingError ? (
-              <ErrorState message="Failed to load Best Selling Products." />
+              <div className="min-h-[300px] flex items-center justify-center">
+                <ErrorState message="Failed to load Best Sellers" />
+              </div>
             ) : (
               <ProductSlider
-                title="Best Selling Products"
                 products={bestSellingProducts}
                 hideDetails
               />
             )}
           </CardContent>
         </Card>
+        
+        {/* Browsing History Section */}
+        <div className='p-4 bg-background'>
+          <BrowsingHistoryList />
+        </div>
       </div>
     </>
   );
