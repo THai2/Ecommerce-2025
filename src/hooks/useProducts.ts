@@ -61,3 +61,81 @@ export function useProductsByTag(tag: string, limit: number = 10) {
   
     return { products, loading, error };
   }
+
+
+  // Hook mới: Lấy một product theo slug
+export function useProductBySlug(slug: string) {
+  const [product, setProduct] = useState<IProduct | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${baseUrl}/api/products?slug=${slug}`, {
+          cache: 'no-store',
+        });
+        if (!res.ok) throw new Error('Failed to fetch product');
+        const data = await res.json();
+        setProduct(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (slug) {
+      fetchProduct();
+    }
+  }, [slug]);
+
+  return { product, loading, error };
+}
+
+// Hook mới: Lấy related products theo category
+export function useRelatedProductsByCategory({
+  category,
+  productId,
+  limit = 10,
+  page = 1,
+}: {
+  category: string;
+  productId: string;
+  limit?: number;
+  page?: number;
+}) {
+  const [products, setProducts] = useState<IProduct[]>([]);
+  const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const fetchRelatedProducts = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(
+          `${baseUrl}/api/products?category=${category}&productId=${productId}&limit=${limit}&page=${page}`,
+          { cache: 'no-store' }
+        );
+        if (!res.ok) throw new Error('Failed to fetch related products');
+        const { data, totalPages } = await res.json();
+        setProducts(data);
+        setTotalPages(totalPages);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (category && productId) {
+      fetchRelatedProducts();
+    }
+  }, [category, productId, limit, page]);
+
+  return { products, totalPages, loading, error };
+}
