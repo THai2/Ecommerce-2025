@@ -3,16 +3,16 @@
 import { useProductMetadata, useRelatedProductsByCategory } from '@/hooks';
 import { useParams, useSearchParams } from 'next/navigation';
 import Head from 'next/head';
-import ProductGallery from '@/components/shared/product/productGallery';
-import ProductPrice from '@/components/shared/product/productPrice';
-import ProductSlider from '@/components/shared/product/productSlider';
+import ProductGallery from '@/components/shared/product/product-gallery';
+import ProductPrice from '@/components/shared/product/product-price';
+import ProductSlider from '@/components/shared/product/product-slider';
 import Rating from '@/components/shared/product/rating';
-import SelectVariant from '@/components/shared/product/selectVariant';
+import SelectVariant from '@/components/shared/product/select-variant';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import BrowsingHistoryList from '@/components/shared/browsing-history-list';
 import AddToBrowsingHistory from '@/components/shared/product/add-to-browsing-history';
-import AddToCart from '@/components/shared/product/addToCart';
+import AddToCart from '@/components/shared/product/add-to-cart';
 import { generateId, round2 } from '@/lib/utils';
 
 export default function ProductDetails() {

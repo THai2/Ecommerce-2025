@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getStorage } from 'firebase/storage';
+import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 
 // Cấu hình Firebase (thay bằng thông tin của bạn)
 const firebaseConfig = {
@@ -16,5 +17,7 @@ const app = initializeApp(firebaseConfig);
 
 // Khởi tạo Firebase Storage
 const storage = getStorage(app);
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
 
-export { storage };
+export { storage,auth,googleProvider };

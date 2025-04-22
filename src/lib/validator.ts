@@ -2,6 +2,10 @@ import { z } from 'zod'
 import { formatNumberWithDecimal } from './utils'
 
 // Common
+const MongoId = z
+  .string()
+  .regex(/^[0-9a-fA-F]{24}$/, { message: 'Invalid MongoDB ID' })
+
 const Price = (field: string) =>
   z.coerce
     .number()
@@ -65,6 +69,57 @@ export const OrderItemSchema = z.object({
   size: z.string().optional(),
   color: z.string().optional(),
 })
+export const ShippingAddressSchema = z.object({
+  fullName: z.string().min(1, 'Full name is required'),
+  street: z.string().min(1, 'Address is required'),
+  city: z.string().min(1, 'City is required'),
+  postalCode: z.string().min(1, 'Postal code is required'),
+  province: z.string().min(1, 'Province is required'),
+  phone: z.string().min(1, 'Phone number is required'),
+  country: z.string().min(1, 'Country is required'),
+})
+// Order
+export const OrderInputSchema = z.object({
+  user: z.union([
+    MongoId,
+    z.object({
+      name: z.string(),
+      email: z.string().email(),
+    }),
+  ]),
+  items: z
+    .array(OrderItemSchema)
+    .min(1, 'Order must contain at least one item'),
+  shippingAddress: ShippingAddressSchema,
+  paymentMethod: z.string().min(1, 'Payment method is required'),
+  paymentResult: z
+    .object({
+      id: z.string(),
+      status: z.string(),
+      email_address: z.string(),
+      pricePaid: z.string(),
+    })
+    .optional(),
+  itemsPrice: Price('Items price'),
+  shippingPrice: Price('Shipping price'),
+  taxPrice: Price('Tax price'),
+  totalPrice: Price('Total price'),
+  expectedDeliveryDate: z
+    .string() // Accept string input
+    .transform((val) => new Date(val)) // Convert to Date
+    .refine((date) => !isNaN(date.getTime()), {
+      message: 'Invalid date format for expected delivery date',
+    }) // Ensure valid Date
+    .refine((date) => date > new Date(), {
+      message: 'Expected delivery date must be in the future',
+    }), // Keep your future date check
+  isDelivered: z.boolean().default(false),
+  deliveredAt: z.date().optional(),
+  isPaid: z.boolean().default(false),
+  paidAt: z.date().optional(),
+})
+
+//Cart
 
 export const CartSchema = z.object({
   items: z
@@ -76,6 +131,54 @@ export const CartSchema = z.object({
   shippingPrice: z.optional(z.number()),
   totalPrice: z.number(),
   paymentMethod: z.optional(z.string()),
+  shippingAddress: z.optional(ShippingAddressSchema),
   deliveryDateIndex: z.optional(z.number()),
   expectedDeliveryDate: z.optional(z.date()),
+})
+
+
+
+
+// USER
+const UserName = z
+  .string()
+  .min(2, { message: 'Username must be at least 2 characters' })
+  .max(50, { message: 'Username must be at most 30 characters' })
+const Email = z.string().min(1, 'Email is required').email('Email is invalid')
+const Password = z.string().min(3, 'Password must be at least 3 characters')
+const UserRole = z.string().min(1, 'role is required')
+
+export const UserInputSchema = z.object({
+  name: UserName,
+  email: Email,
+  image: z.string().optional(),
+  emailVerified: z.boolean(),
+  role: UserRole,
+  firebaseUid: z.string().optional(),
+  password: Password,
+  phone: z.number().optional(),
+  paymentMethod: z.string().min(1, 'Payment method is required'),
+  address: z.object({
+    fullName: z.string().min(1, 'Full name is required'),
+    street: z.string().min(1, 'Street is required'),
+    city: z.string().min(1, 'City is required'),
+    province: z.string().min(1, 'Province is required'),
+    postalCode: z.string().min(1, 'Postal code is required'),
+    country: z.string().min(1, 'Country is required'),
+    phone: z.string().min(1, 'Phone number is required'),
+  }),
+  isBlocked: z.boolean().optional().default(false),
+})
+
+export const UserSignInSchema = z.object({
+  email: Email,
+  password: Password,
+})
+
+export const UserSignUpSchema = UserSignInSchema.extend({
+  name: UserName,
+  confirmPassword: Password,
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ['confirmPassword'],
 })

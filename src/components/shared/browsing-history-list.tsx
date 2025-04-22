@@ -1,7 +1,7 @@
 'use client'
-import useBrowsingHistory from '@/hooks/useBrowsingHistory'
+import useBrowsingHistory from '@/hooks/use-browsing-history'
 import React, { useEffect } from 'react'
-import ProductSlider from './product/productSlider'
+import ProductSlider from './product/product-slider'
 import { Separator } from '../ui/separator'
 import { cn } from '@/lib/utils'
 

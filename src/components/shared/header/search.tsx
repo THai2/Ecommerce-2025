@@ -1,5 +1,6 @@
 import { SearchIcon } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+
 import {
   Select,
   SelectContent,
@@ -8,51 +9,38 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { APP_NAME } from '@/lib/constants'
-
 const categories = ['men', 'women', 'kids', 'accessories']
-
-export default function Search() {
+export default async function Search() {
   return (
     <form
-      action="/search"
-      method="GET"
-      className="flex items-stretch h-12 w-full max-w-2xl group"
+      action='/search'
+      method='GET'
+      className='flex  items-stretch h-10 '
     >
-      {/* Category Select */}
-      <Select name="category">
-        <SelectTrigger className=" w-auto h-full px-4 bg-gray-800 border border-gray-700 rounded-l-full text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 group-hover:border-indigo-400">
-          <SelectValue placeholder="All" />
+      <Select name='category'>
+        <SelectTrigger className='w-auto h-full dark:border-gray-200 bg-gray-100 text-black border-r  rounded-r-none rounded-l-md'>
+          <SelectValue placeholder='All' />
         </SelectTrigger>
-        <SelectContent className="bg-gray-800 text-white border-gray-700">
-          <SelectItem value="all" className="hover:bg-indigo-600 hover:text-white">
-            All
-          </SelectItem>
+        <SelectContent position='popper'>
+          <SelectItem value='all'>All</SelectItem>
           {categories.map((category) => (
-            <SelectItem
-              key={category}
-              value={category}
-              className="capitalize hover:bg-indigo-600 hover:text-white"
-            >
+            <SelectItem key={category} value={category}>
               {category}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
-
-      {/* Search Input */}
       <Input
-        className="flex-1 h-full rounded-none bg-gray-800 border-y border-gray-700 text-white placeholder-gray-400 focus:ring-0 focus:border-indigo-500 transition-all duration-300 group-hover:border-indigo-400"
-        placeholder={`Search on ${APP_NAME}...`}
-        name="q"
-        type="search"
+        className='flex-1 rounded-none dark:border-gray-200 bg-gray-100 text-black text-base h-full'
+        placeholder={`Search Site ${APP_NAME}`}
+        name='q'
+        type='search'
       />
-
-      {/* Submit Button */}
       <button
-        type="submit"
-        className="h-full px-4 bg-indigo-600 text-white rounded-r-full hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
+        type='submit'
+        className='bg-primary text-primary-foreground text-black rounded-s-none rounded-e-md h-full px-3 py-2 '
       >
-        <SearchIcon className="w-6 h-6" />
+        <SearchIcon className='w-6 h-6' />
       </button>
     </form>
   )

@@ -4,13 +4,26 @@ import { ChevronUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { APP_NAME } from '@/lib/constants'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 export default function Footer() {
   const [isVisible, setIsVisible] = useState(false);
+  const footerRef = useRef(null);
   
   useEffect(() => {
-    setIsVisible(true);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // When footer comes into view
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.1 } // Trigger when 10% of the footer is visible
+    );
+    
+    if (footerRef.current) {
+      observer.observe(footerRef.current);
+    }
     
     const handleScroll = () => {
       const scrollTop = window.scrollY;
@@ -18,26 +31,32 @@ export default function Footer() {
       if (backToTopButton) {
         if (scrollTop > 300) {
           backToTopButton.classList.add('opacity-100');
-          backToTopButton.classList.remove('opacity-70');
+          backToTopButton.classList.remove('opacity-0');
         } else {
-          backToTopButton.classList.add('opacity-70');
+          backToTopButton.classList.add('opacity-0');
           backToTopButton.classList.remove('opacity-100');
         }
       }
     };
     
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    
+    return () => {
+      if (footerRef.current) {
+        observer.unobserve(footerRef.current);
+      }
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   return (
-    <footer className="bg-black text-white relative overflow-hidden">
+    <footer ref={footerRef} className="bg-black text-white relative overflow-hidden">
       {/* Animated Background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-900 via-black to-blue-900 opacity-80"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-950 via-black to-blue-900 opacity-80"></div>
       <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
-        <div className="absolute -bottom-10 -left-10 w-1/3 h-1/3 bg-blue-700 rounded-full filter blur-3xl opacity-10 animate-pulse"></div>
-        <div className="absolute -top-10 -right-10 w-1/3 h-1/3 bg-purple-700 rounded-full filter blur-3xl opacity-10 animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-blue-700 to-blue-400"></div>
+        <div className={`absolute -bottom-10 -left-10 w-1/3 h-1/3 bg-blue-700 rounded-full filter blur-3xl opacity-0 transition-opacity duration-1000 ${isVisible ? 'opacity-20 animate-pulse' : ''}`}></div>
+        <div className={`absolute -top-10 -right-10 w-1/3 h-1/3 bg-blue-600 rounded-full filter blur-3xl opacity-0 transition-opacity duration-1000 ${isVisible ? 'opacity-10 animate-pulse' : ''}`} style={{animationDelay: '2s'}}></div>
       </div>
 
       {/* Back to Top Button */}
@@ -45,7 +64,7 @@ export default function Footer() {
         <Button
           id="back-to-top"
           variant="ghost"
-          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 w-full rounded-none py-4 transition-all duration-500 transform hover:-translate-y-1 opacity-70 group"
+          className="bg-gradient-to-r from-blue-700 to-blue-500 hover:from-blue-800 hover:to-blue-600 w-full rounded-none py-4 transition-all duration-500 transform hover:-translate-y-1 opacity-0 group"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
           <div className="flex items-center justify-center">
@@ -62,10 +81,10 @@ export default function Footer() {
       <div className={`relative z-10 max-w-7xl mx-auto px-4 pt-16 pb-12 transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
           {/* Company Info with Animation */}
-          <div className="space-y-6 transition-all duration-700 transform hover:translate-x-1">
+          <div className={`space-y-6 transition-all duration-700 ${isVisible ? 'translate-x-0' : 'translate-x-10 opacity-0'}`}>
             <div className="relative inline-block">
               <h2 className="text-2xl font-bold tracking-tight">{APP_NAME}</h2>
-              <div className="absolute h-1 w-20 bg-gradient-to-r from-blue-500 to-purple-500 bottom-0 left-0 transform translate-y-2"></div>
+              <div className={`absolute h-1 w-0 bg-gradient-to-r from-blue-500 to-blue-300 bottom-0 left-0 transform translate-y-2 transition-all duration-1000 ${isVisible ? 'w-20' : ''}`}></div>
             </div>
             <p className="text-gray-300 leading-relaxed">
               Leading the industry with innovative solutions since 2000.
@@ -79,10 +98,10 @@ export default function Footer() {
           </div>
           
           {/* Quick Links with Hover Effect */}
-          <div className="space-y-6">
+          <div className={`space-y-6 transition-all duration-700 delay-100 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
             <div className="relative inline-block">
               <h3 className="text-xl font-bold tracking-tight">Quick Links</h3>
-              <div className="absolute h-1 w-16 bg-gradient-to-r from-blue-500 to-purple-500 bottom-0 left-0 transform translate-y-2"></div>
+              <div className={`absolute h-1 w-0 bg-gradient-to-r from-blue-500 to-blue-300 bottom-0 left-0 transform translate-y-2 transition-all duration-1000 ${isVisible ? 'w-16' : ''}`}></div>
             </div>
             <ul className="space-y-3">
               {[
@@ -94,12 +113,12 @@ export default function Footer() {
                 <li key={index} className="overflow-hidden">
                   <Link 
                     href={link.href} 
-                    className="group flex items-center text-gray-300 hover:text-white transition-all duration-300"
+                    className="group flex items-center text-gray-300 hover:text-blue-300 transition-all duration-300"
                   >
                     <span className="w-0 group-hover:w-6 overflow-hidden transition-all duration-300 h-5 flex items-center">
                       <span className="transform translate-x-2">→</span>
                     </span>
-                    <span className="group-hover:border-b group-hover:border-purple-500 pb-1 transition-all duration-300">{link.text}</span>
+                    <span className="group-hover:border-b group-hover:border-blue-500 pb-1 transition-all duration-300">{link.text}</span>
                   </Link>
                 </li>
               ))}
@@ -107,17 +126,17 @@ export default function Footer() {
           </div>
           
           {/* Newsletter Signup */}
-          <div className="space-y-6">
+          <div className={`space-y-6 transition-all duration-700 delay-200 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
             <div className="relative inline-block">
               <h3 className="text-xl font-bold tracking-tight">Stay Updated</h3>
-              <div className="absolute h-1 w-16 bg-gradient-to-r from-blue-500 to-purple-500 bottom-0 left-0 transform translate-y-2"></div>
+              <div className={`absolute h-1 w-0 bg-gradient-to-r from-blue-500 to-blue-300 bottom-0 left-0 transform translate-y-2 transition-all duration-1000 ${isVisible ? 'w-16' : ''}`}></div>
             </div>
             <p className="text-gray-300 text-sm">Subscribe to our newsletter for the latest updates and offers.</p>
             <div className="relative mt-2 group">
               <input 
                 type="email" 
                 placeholder="Your email address" 
-                className="w-full bg-gray-900 border-0 border-b-2 border-gray-700 group-hover:border-purple-500 focus:border-blue-500 transition-colors duration-300 p-2 text-sm outline-none text-white placeholder-gray-500"
+                className="w-full bg-gray-900 border-0 border-b-2 border-gray-700 group-hover:border-blue-500 focus:border-blue-400 transition-colors duration-300 p-2 text-sm outline-none text-white placeholder-gray-500"
               />
               <button className="absolute right-0 top-0 p-2 text-gray-400 hover:text-blue-500 transition-colors duration-300">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -131,10 +150,10 @@ export default function Footer() {
           </div>
           
           {/* Contact with Animated Icons */}
-          <div className="space-y-6">
+          <div className={`space-y-6 transition-all duration-700 delay-300 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
             <div className="relative inline-block">
               <h3 className="text-xl font-bold tracking-tight">Get in Touch</h3>
-              <div className="absolute h-1 w-16 bg-gradient-to-r from-blue-500 to-purple-500 bottom-0 left-0 transform translate-y-2"></div>
+              <div className={`absolute h-1 w-0 bg-gradient-to-r from-blue-500 to-blue-300 bottom-0 left-0 transform translate-y-2 transition-all duration-1000 ${isVisible ? 'w-16' : ''}`}></div>
             </div>
             <address className="not-italic text-sm text-gray-300 space-y-4">
               <div className="flex items-center group">
@@ -148,28 +167,28 @@ export default function Footer() {
               </div>
               
               <div className="flex items-center group">
-                <div className="w-8 h-8 rounded-full bg-gray-800 group-hover:bg-purple-900 flex items-center justify-center mr-3 transition-colors duration-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-8 h-8 rounded-full bg-gray-800 group-hover:bg-blue-900 flex items-center justify-center mr-3 transition-colors duration-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
                 </div>
-                <span className="group-hover:text-purple-400 transition-colors duration-300">+1 (123) 456-7890</span>
+                <span className="group-hover:text-blue-400 transition-colors duration-300">+1 (123) 456-7890</span>
               </div>
               
               <div className="flex items-center group">
-                <div className="w-8 h-8 rounded-full bg-gray-800 group-hover:bg-pink-900 flex items-center justify-center mr-3 transition-colors duration-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-8 h-8 rounded-full bg-gray-800 group-hover:bg-blue-900 flex items-center justify-center mr-3 transition-colors duration-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <span className="group-hover:text-pink-400 transition-colors duration-300">contact@{APP_NAME.toLowerCase()}.com</span>
+                <span className="group-hover:text-blue-400 transition-colors duration-300">contact@{APP_NAME.toLowerCase()}.com</span>
               </div>
             </address>
           </div>
         </div>
         
         {/* Social Media & Final Note */}
-        <div className="mt-16 pt-8 border-t border-gray-800">
+        <div className={`mt-16 pt-8 border-t border-gray-800 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
           <div className="flex flex-wrap justify-center gap-6">
             {/* Social Media Icons with Hover Animations */}
             {[
@@ -182,10 +201,10 @@ export default function Footer() {
               <a 
                 key={index}
                 href="#" 
-                className="group"
+                className={`group transition-all duration-700 delay-${700 + (index * 100)} ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
                 aria-label={social.name}
               >
-                <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 text-gray-400 hover:text-white hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-600 transition-all duration-300 transform group-hover:scale-110 group-hover:rotate-3">
+                <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 text-gray-400 hover:text-white hover:bg-gradient-to-r hover:from-blue-700 hover:to-blue-500 transition-all duration-300 transform group-hover:scale-110 group-hover:rotate-3">
                   <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path fillRule="evenodd" d={social.icon} clipRule="evenodd" />
                   </svg>
@@ -194,12 +213,12 @@ export default function Footer() {
             ))}
           </div>
           
-          <div className="mt-8 text-center">
+          <div className={`mt-8 text-center transition-all duration-1000 delay-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             <div className="inline-flex items-center space-x-2">
               <span className="text-xs text-gray-500">Made with</span>
               <div className="relative w-6 h-6 flex items-center justify-center">
-                <span className="absolute animate-ping opacity-75 text-red-500">♥</span>
-                <span className="relative text-red-500">♥</span>
+                <span className="absolute animate-ping opacity-75 text-blue-500">♥</span>
+                <span className="relative text-blue-500">♥</span>
               </div>
               <span className="text-xs text-gray-500">by the {APP_NAME} team</span>
             </div>

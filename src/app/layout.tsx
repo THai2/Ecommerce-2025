@@ -10,6 +10,7 @@ const outfit = Outfit({
 
 import { APP_DESCRIPTION, APP_NAME, APP_SLOGAN } from '@/lib/constants'
 import { Metadata } from 'next';
+import ClientProviders from '@/components/shared/client-providers';
 export const metadata: Metadata = {
   title: {
     template: `%s | ${APP_NAME}`,
@@ -26,7 +27,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${outfit.className} dark:bg-gray-900`}>
         <ThemeProvider>
-          <SidebarProvider>{children}</SidebarProvider>
+          <SidebarProvider><ClientProviders>{children}</ClientProviders></SidebarProvider>
         </ThemeProvider>
       </body>
     </html>

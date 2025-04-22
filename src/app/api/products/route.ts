@@ -2,7 +2,7 @@ import { connectToDatabase } from '@/lib/db';
 import Product, { IProduct } from '@/models/product'; // Cập nhật import
 import { NextResponse } from 'next/server';
 
-// GET: Lấy products cho card (hàm cũ)
+// GET: Lấy products cho card 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -44,7 +44,7 @@ export async function GET(request: Request) {
       });
     }
 
-    // Lấy products cho card (logic cũ)
+    // Lấy products cho card 
     if (tag) {
       const products = await Product.find(
         { tags: { $in: [tag] }, isPublished: true },
@@ -65,7 +65,7 @@ export async function GET(request: Request) {
   }
 }
 
-// GET products by tag (hàm mới)
+// GET products by tag 
 export async function POST(request: Request) {
   try {
     const { tag, limit = 10 } = await request.json();

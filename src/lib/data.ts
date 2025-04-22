@@ -1,6 +1,49 @@
-import { Data, IProductInput } from '@/types'
+import { Data, IProductInput, IUserInput } from '@/types'
 import { toSlug } from './utils'
-
+import bcrypt from 'bcryptjs'
+const users: IUserInput[] = [
+  {
+    name: 'John',
+    email: 'admin@example.com',
+    password: bcrypt.hashSync('123456', 5),
+    role: 'Admin',
+    firebaseUid: '',
+    image: '',
+    isBlocked: false,
+    address: {
+      fullName: 'John Doe',
+      street: '111 Main St',
+      city: 'New York',
+      province: 'NY',
+      postalCode: '10001',
+      country: 'USA',
+      phone: '123-456-7890',
+    },
+    paymentMethod: 'Stripe',
+    emailVerified: false,
+  },
+  {
+    name: 'Jane',
+    email: 'jane@example.com',
+    password: bcrypt.hashSync('123456', 5),
+    role: 'User',
+    firebaseUid: '1234567890',
+    image: 'https://example.com/jane.jpg',
+    phone   : 1234567890,
+    isBlocked: false,
+    address: {
+      fullName: 'Jane Harris',
+      street: '222 Main St',
+      city: 'New York',
+      province: 'NY',
+      postalCode: '1002',
+      country: 'USA',
+      phone: '123-456-7890',
+    },
+    paymentMethod: 'Cash On Delivery',
+    emailVerified: false,
+  },
+]
 const products: IProductInput[] = [
   // T-Shirts
   {
@@ -274,6 +317,7 @@ const products: IProductInput[] = [
 ]
 
 const data: Data = {
+  users,
   headerMenus: [
     {
       name: "Today's Deal",
@@ -332,6 +376,7 @@ const data: Data = {
     },
   ],
   products,
+  
 }
 
 export default data
