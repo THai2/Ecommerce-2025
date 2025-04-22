@@ -185,10 +185,10 @@ export default function HomePage() {
               <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
                 <div>
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
-                    Today's Deals
+                    Today&apos;s Deals
                     <span className="ml-2 px-2 py-0.5 bg-red-500 text-white text-xs rounded-full uppercase font-medium tracking-wide">Limited Time</span>
                   </h2>
-                  <p className="text-sm md:text-base text-gray-600 mt-1">Don't miss out on these limited offers</p>
+                  <p className="text-sm md:text-base text-gray-600 mt-1">Don&apos;t miss out on these limited offers</p>
                 </div>
                 
                 <a 
