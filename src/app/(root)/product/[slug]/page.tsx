@@ -1,112 +1,124 @@
-'use client';
+import { Card, CardContent } from '@/components/ui/card'
+import {
+  getProductBySlug,
+  getRelatedProductsByCategory,
+} from '@/lib/actions/product.actions'
 
-import { useProductMetadata, useRelatedProductsByCategory } from '@/hooks';
-import { useParams, useSearchParams } from 'next/navigation';
-import Head from 'next/head';
-import ProductGallery from '@/components/shared/product/product-gallery';
-import ProductPrice from '@/components/shared/product/product-price';
-import ProductSlider from '@/components/shared/product/product-slider';
-import Rating from '@/components/shared/product/rating';
-import SelectVariant from '@/components/shared/product/select-variant';
-import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import BrowsingHistoryList from '@/components/shared/browsing-history-list';
-import AddToBrowsingHistory from '@/components/shared/product/add-to-browsing-history';
-import AddToCart from '@/components/shared/product/add-to-cart';
-import { generateId, round2 } from '@/lib/utils';
+import SelectVariant from '@/components/shared/product/select-variant'
+import ProductPrice from '@/components/shared/product/product-price'
+import ProductGallery from '@/components/shared/product/product-gallery'
+import { Separator } from '@/components/ui/separator'
+import ProductSlider from '@/components/shared/product/product-slider'
+import BrowsingHistoryList from '@/components/shared/browsing-history-list'
+import AddToCart from '@/components/shared/product/add-to-cart'
+import { generateId, round2 } from '@/lib/utils'
+import RatingSummary from '@/components/shared/product/rating-summary'
+import ReviewList from './review-list'
+import { auth } from '../../../../../auth'
 
-export default function ProductDetails() {
-  const params = useParams();
-  const searchParams = useSearchParams();
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }>
+}) {
+  const params = await props.params
+  const product = await getProductBySlug(params.slug)
+  if (!product) {
+    return { title: 'Product not found' }
+  }
+  return {
+    title: product.name,
+    description: product.description,
+  }
+}
 
-  const slug = params?.slug as string;
-  const page = Number(searchParams?.get('page') || '1');
-  const color = searchParams?.get('color') || '';
-  const size = searchParams?.get('size') || '';
+export default async function ProductDetails(props: {
+  params: Promise<{ slug: string }>
+  searchParams: Promise<{ page: string; color: string; size: string }>
+}) {
+  const searchParams = await props.searchParams
 
-  // Lấy product và metadata
-  const { product, loading: productLoading, error: productError, metadata } = useProductMetadata(slug);
+  const { page, color, size } = searchParams
 
-  // Lấy related products
-  const { products: relatedProducts, loading: relatedLoading, error: relatedError } =
-    useRelatedProductsByCategory({
-      category: product?.category || '',
-      productId: product?._id || '',
-      page,
-      limit: 4, // Giả định PAGE_SIZE = 4
-    });
+  const params = await props.params
 
-  if (productLoading) return <div>Loading product...</div>;
-  if (productError) return <div>Error: {productError}</div>;
-  if (!product) return <div>Product not found</div>;
+  const { slug } = params
 
+  const product = await getProductBySlug(slug)
+
+  const relatedProducts = await getRelatedProductsByCategory({
+    category: product.category,
+    productId: product._id,
+    page: Number(page || '1'),
+  })
+ const session = await auth()
   return (
-    <>
-      {/* Cập nhật metadata bằng next/head */}
-      <Head>
-        <title>{metadata.title}</title>
-        <meta name="description" content={metadata.description || ''} />
-      </Head>
+    <div>
+      <section>
+        <div className='grid grid-cols-1 md:grid-cols-5  '>
+          <div className='col-span-2'>
+            <ProductGallery images={product.images} />
+          </div>
 
-      <AddToBrowsingHistory id={product._id} category={product.category} />
-
-      <div>
-        <section>
-          <div className="grid grid-cols-1 md:grid-cols-5">
-            <div className="col-span-2">
-              <ProductGallery images={product.images} />
-            </div>
-
-            <div className="flex w-full flex-col gap-2 md:p-5 col-span-2">
-              <div className="flex flex-col gap-3">
-                <p className="p-medium-16 rounded-full bg-grey-500/10 text-grey-500">
-                  Brand {product.brand} {product.category}
-                </p>
-                <h1 className="font-bold text-lg lg:text-xl">{product.name}</h1>
-                <div className="flex items-center gap-2">
-                  <span>{product.avgRating.toFixed(1)}</span>
-                  <Rating rating={product.avgRating} />
-                  <span>{product.numReviews} ratings</span>
-                </div>
-                <Separator />
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <div className="flex gap-3">
-                    <ProductPrice
-                      price={product.price}
-                      listPrice={product.listPrice}
-                      isDeal={product.tags.includes('todays-deal')}
-                      forListing={false}
-                    />
-                  </div>
-                </div>
+          <div className='flex w-full flex-col gap-2 md:p-5 col-span-2'>
+            <div className='flex flex-col gap-3'>
+              <p className='p-medium-16 rounded-full bg-grey-500/10   text-grey-500'>
+                Brand {product.brand} {product.category}
+              </p>
+              <h1 className='font-bold text-lg lg:text-xl'>
+                {product.name}
+              </h1>
+              <div className='flex items-center gap-2'>
+                  <RatingSummary
+                avgRating={product.avgRating}
+                numReviews={product.numReviews}
+                asPopover
+                ratingDistribution={product.ratingDistribution}
+              />
               </div>
-              <div>
-                <SelectVariant
-                  product={product}
-                  size={size || product.sizes[0]}
-                  color={color || product.colors[0]}
-                />
-              </div>
-              <Separator className="my-2" />
-              <div className="flex flex-col gap-2">
-                <p className="p-bold-20 text-grey-600">Description:</p>
-                <p className="p-medium-16 lg:p-regular-18">{product.description}</p>
+              <Separator />
+              <div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
+                <div className='flex gap-3'>
+                  <ProductPrice
+                    price={product.price}
+                    listPrice={product.listPrice}
+                    isDeal={product.tags.includes('todays-deal')}
+                    forListing={false}
+                  />
+                </div>
               </div>
             </div>
             <div>
-              <Card>
-                <CardContent className="p-4 flex flex-col gap-4">
-                  <ProductPrice price={product.price} />
-                  {product.countInStock > 0 && product.countInStock <= 3 && (
-                    <div className="text-destructive font-bold">
-                      {`Only ${product.countInStock} left in stock - order soon`}
-                    </div>
-                  )}
-                  {product.countInStock !== 0 ? (
-                    <div className="text-green-700 text-xl">In Stock</div>
-                  ) : (
-                    <div className="text-destructive text-xl">Out of Stock</div>
-                  )} {product.countInStock !== 0 && (
+              <SelectVariant
+                product={product}
+                size={size || product.sizes[0]}
+                color={color || product.colors[0]}
+              />
+            </div>
+            <Separator className='my-2' />
+            <div className='flex flex-col gap-2'>
+              <p className='p-bold-20 text-grey-600'>Description:</p>
+              <p className='p-medium-16 lg:p-regular-18'>
+                {product.description}
+              </p>
+            </div>
+          </div>
+          <div>
+            <Card>
+              <CardContent className='p-4 flex flex-col  gap-4'>
+                <ProductPrice price={product.price} />
+
+                {product.countInStock > 0 && product.countInStock <= 3 && (
+                  <div className='text-destructive font-bold'>
+                    {`Only ${product.countInStock} left in stock - order soon`}
+                  </div>
+                )}
+                {product.countInStock !== 0 ? (
+                  <div className='text-green-700 text-xl'>In Stock</div>
+                ) : (
+                  <div className='text-destructive text-xl'>
+                    Out of Stock
+                  </div>
+                )}
+                 {product.countInStock !== 0 && (
                     <div className='flex justify-center items-center'>
                       <AddToCart
                         item={{
@@ -125,32 +137,27 @@ export default function ProductDetails() {
                       />
                     </div>
                   )}
-                </CardContent>
-              </Card>
-
-             
-            </div>
+              </CardContent>
+            </Card>
+            
           </div>
-        </section>
-
-        <section className="mt-10">
-          {relatedLoading ? (
-            <div>Loading related products...</div>
-          ) : relatedError ? (
-            <div>Error: {relatedError}</div>
-          ) : (
-            <ProductSlider
-              products={relatedProducts}
-              title={`Best Sellers in ${product.category}`}
-            />
-          )}
-        </section>
-
-        <section>
-          <BrowsingHistoryList className='mt-10' />
-        </section>
-
-      </div>
-    </>
-  );
+        </div>
+      </section>
+     <section className='mt-10'>
+        <h2 className='h2-bold mb-2' id='reviews'>
+          Customer Reviews
+        </h2>
+        <ReviewList product={product} userId={session?.user.id} />
+      </section>
+      <section className='mt-10'>
+        <ProductSlider
+          products={relatedProducts.data}
+          title={`Best Sellers in ${product.category}`}
+        />
+      </section>
+      <section>
+        <BrowsingHistoryList className='mt-10' />
+      </section>
+    </div>
+  )
 }

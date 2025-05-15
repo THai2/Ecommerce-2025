@@ -281,6 +281,9 @@
 }
 
 @layer utilities {
+  .item-button {
+    @apply p-3 hover:bg-muted hover:no-underline;
+  }
   /* For Remove Date Icon */
   input[type="date"]::-webkit-inner-spin-button,
   input[type="time"]::-webkit-inner-spin-button,
@@ -289,6 +292,10 @@
     display: none;
     -webkit-appearance: none;
   }
+    .flex-between {
+    @apply flex justify-between items-center;
+  }
+
 }
 
 /* third-party libraries CSS */
