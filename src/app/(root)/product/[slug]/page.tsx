@@ -15,6 +15,7 @@ import { generateId, round2 } from '@/lib/utils'
 import RatingSummary from '@/components/shared/product/rating-summary'
 import ReviewList from './review-list'
 import { auth } from '../../../../../auth'
+import AddToBrowsingHistory from '@/components/shared/product/add-to-browsing-history'
 
 export async function generateMetadata(props: {
   params: Promise<{ slug: string }>
@@ -52,6 +53,7 @@ export default async function ProductDetails(props: {
  const session = await auth()
   return (
     <div>
+      <AddToBrowsingHistory id={product._id} category={product.category} />
       <section>
         <div className='grid grid-cols-1 md:grid-cols-5  '>
           <div className='col-span-2'>

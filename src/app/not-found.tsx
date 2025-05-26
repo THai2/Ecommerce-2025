@@ -1,4 +1,5 @@
 import GridShape from "@/components/common/GridShape";
+import { APP_NAME } from "@/lib/constants";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -40,7 +41,7 @@ export default function NotFound() {
       </div>
       {/* <!-- Footer --> */}
       <p className="absolute text-sm text-center text-gray-500 -translate-x-1/2 bottom-6 left-1/2 dark:text-gray-400">
-        &copy; {new Date().getFullYear()} - Shopify
+        &copy; {new Date().getFullYear()} - {APP_NAME}&apos;s{' '}
       </p>
     </div>
   );

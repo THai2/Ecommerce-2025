@@ -200,3 +200,24 @@ export const UserSignUpSchema = UserSignInSchema.extend({
   message: "Passwords don't match",
   path: ['confirmPassword'],
 })
+
+
+//CAROUSELS
+export const CarouselInputSchema = z.object({
+  title: z.string()
+    .min(1, 'Title is required')
+    .max(200, 'Title must be at most 200 characters'),
+  buttonCaption: z.string()
+    .min(1, 'Button caption is required')
+    .max(50, 'Button caption must be at most 50 characters'),
+  imageUrl: z.string()
+    .url('Image URL is invalid')
+    .min(1, 'Image URL is required'),
+  url: z.string()
+    .min(1, 'URL is required'),
+  isPublished: z.boolean()
+})
+
+export const CarouselUpdateSchema = CarouselInputSchema.extend({
+  _id: z.string(),
+})

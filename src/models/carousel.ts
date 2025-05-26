@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 // Định nghĩa interface cho Carousel
 export interface ICarousel extends Document {
+  _id: string
   title: string;
   buttonCaption: string;
   imageUrl: string;
