@@ -89,12 +89,14 @@ export default function OrderDetailsForm({
                 <TableRow>
                   <TableHead>Item</TableHead>
                   <TableHead>Quantity</TableHead>
+                  <TableHead>Color</TableHead>
+                  <TableHead>Size</TableHead>
                   <TableHead>Price</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {items.map((item) => (
-                  <TableRow key={item.slug}>
+                  <TableRow key={`${item.slug}-${item.color}-${item.size}`}>
                     <TableCell>
                       <Link
                         href={`/product/${item.slug}`}
@@ -111,6 +113,12 @@ export default function OrderDetailsForm({
                     </TableCell>
                     <TableCell>
                       <span className='px-2'>{item.quantity}</span>
+                    </TableCell>
+                    <TableCell>
+                      <span className='px-2'>{item.color}</span>
+                    </TableCell>
+                     <TableCell>
+                      <span className='px-2'>{item.size}</span>
                     </TableCell>
                     <TableCell className='text-right'>${item.price}</TableCell>
                   </TableRow>
