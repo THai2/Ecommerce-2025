@@ -2,11 +2,14 @@
 import { IUserName, IUserSignIn, IUserSignUp } from '@/types'
 import { auth, signIn, signOut } from '../../../auth'
 import { redirect } from 'next/navigation'
-import { UserSignUpSchema } from '../validator'
+import { UserSignUpSchema, UserUpdateSchema } from '../validator'
 import { connectToDatabase } from '../db'
 import bcrypt from 'bcryptjs'
 import { formatError } from '../utils'
-import User from '@/models/user'
+import User, { IUser } from '@/models/user'
+import { revalidatePath } from 'next/cache'
+import { PAGE_SIZE } from '../constants'
+import { z } from 'zod'
 
 export async function signInWithCredentials(user: IUserSignIn) {
   return await signIn('credentials', { ...user, redirect: false })
@@ -55,3 +58,79 @@ export async function updateUserName(user: IUserName) {
     return { success: false, message: formatError(error) }
   }
 }
+
+// DELETE
+
+export async function deleteUser(id: string) {
+  try {
+    await connectToDatabase()
+    const res = await User.findByIdAndDelete(id)
+    if (!res) throw new Error('Use not found')
+    revalidatePath('/admin/users')
+    return {
+      success: true,
+      message: 'User deleted successfully',
+    }
+  } catch (error) {
+    return { success: false, message: formatError(error) }
+  }
+}
+
+// GET ALL USER FOR ADMIN
+export async function getAllUsers({
+  limit,
+  page,
+}: {
+  limit?: number
+  page: number
+}) {
+  limit = limit || PAGE_SIZE
+  await connectToDatabase()
+
+  const skipAmount = (Number(page) - 1) * limit
+  const users = await User.find()
+    .sort({ createdAt: 'desc' })
+    .skip(skipAmount)
+    .limit(limit)
+  const usersCount = await User.countDocuments()
+  return {
+    data: JSON.parse(JSON.stringify(users)) as IUser[],
+    totalPages: Math.ceil(usersCount / limit),
+  }
+}
+
+//UPDATE BY ADMIN
+export async function updateUser(user: z.infer<typeof UserUpdateSchema>) {
+  try {
+    await connectToDatabase()
+    const dbUser = await User.findById(user._id)
+    if (!dbUser) throw new Error('User not found')
+    
+    dbUser.name = user.name
+    dbUser.email = user.email
+    dbUser.role = user.role
+    
+    // Update isBlocked field if provided
+    if (user.isBlocked !== undefined) {
+      dbUser.isBlocked = user.isBlocked
+    }
+    
+    const updatedUser = await dbUser.save()
+    revalidatePath('/admin/users')
+    
+    return {
+      success: true,
+      message: 'User updated successfully',
+      data: JSON.parse(JSON.stringify(updatedUser)),
+    }
+  } catch (error) {
+    return { success: false, message: formatError(error) }
+  }
+}
+export async function getUserById(userId: string) {
+  await connectToDatabase()
+  const user = await User.findById(userId)
+  if (!user) throw new Error('User not found')
+  return JSON.parse(JSON.stringify(user)) as IUser
+}
+

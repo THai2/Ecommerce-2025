@@ -6,6 +6,7 @@ import {
     Heading,
     Html,
     Img,
+    Link,
     Preview,
     Row,
     Section,
@@ -104,6 +105,7 @@ import {
                 {order.items.map((item) => (
                   <Row key={item.product} className='mt-8'>
                     <Column className='w-20'>
+                    <Link href={`${SERVER_URL}/product/${item.slug}`}>
                       <Img
                         width='80'
                         alt={item.name}
@@ -114,11 +116,16 @@ import {
                             : item.image
                         }
                       />
+                      </Link>
                     </Column>
                     <Column className='align-top'>
+                     <Link href={`${SERVER_URL}/product/${item.slug}`}>
                       <Text className='mx-2 my-0'>
-                        {item.name} x {item.quantity}
+                        {item.name} x {item.quantity} &
+                        [{item.size}] &
+                        [{item.color}].
                       </Text>
+                    </Link>
                     </Column>
                     <Column align='right' className='align-top'>
                       <Text className='m-0 '>{formatCurrency(item.price)}</Text>

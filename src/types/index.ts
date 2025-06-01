@@ -1,4 +1,4 @@
-import { CarouselInputSchema, CartSchema, OrderInputSchema, OrderItemSchema, ProductInputSchema, ReviewInputSchema, ShippingAddressSchema, UserInputSchema, UserNameSchema, UserSignInSchema, UserSignUpSchema } from '@/lib/validator'
+import { CarouselInputSchema, CartSchema, OrderInputSchema, OrderItemSchema, ProductInputSchema, ReviewInputSchema, ShippingAddressSchema, UserInputSchema, UserNameSchema, UserSignInSchema, UserSignUpSchema, WebPageInputSchema } from '@/lib/validator'
 import { z } from 'zod'
 
 //Review
@@ -31,6 +31,7 @@ export type Data = {
     href: string
   }[]
   carousels: ICarouselInput[]
+  webPages: IWebPageInput[]
 }
 
 //Order
@@ -52,3 +53,13 @@ export type IUserInput = z.infer<typeof UserInputSchema>
 export type IUserSignIn = z.infer<typeof UserSignInSchema>
 export type IUserSignUp = z.infer<typeof UserSignUpSchema>
 export type IUserName = z.infer<typeof UserNameSchema>
+
+
+//Wishlist
+export interface IWishlistInput {
+  user: string // ObjectId của User
+  products: string[] // Array ObjectId của Products
+}
+
+// webpage
+export type IWebPageInput = z.infer<typeof WebPageInputSchema>

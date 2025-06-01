@@ -16,6 +16,7 @@ import RatingSummary from '@/components/shared/product/rating-summary'
 import ReviewList from './review-list'
 import { auth } from '../../../../../auth'
 import AddToBrowsingHistory from '@/components/shared/product/add-to-browsing-history'
+import { AddToWishlistButton } from '@/components/shared/add-to-wishlist-button'
 
 export async function generateMetadata(props: {
   params: Promise<{ slug: string }>
@@ -50,7 +51,7 @@ export default async function ProductDetails(props: {
     productId: product._id,
     page: Number(page || '1'),
   })
- const session = await auth()
+  const session = await auth()
   return (
     <div>
       <AddToBrowsingHistory id={product._id} category={product.category} />
@@ -69,12 +70,12 @@ export default async function ProductDetails(props: {
                 {product.name}
               </h1>
               <div className='flex items-center gap-2'>
-                  <RatingSummary
-                avgRating={product.avgRating}
-                numReviews={product.numReviews}
-                asPopover
-                ratingDistribution={product.ratingDistribution}
-              />
+                <RatingSummary
+                  avgRating={product.avgRating}
+                  numReviews={product.numReviews}
+                  asPopover
+                  ratingDistribution={product.ratingDistribution}
+                />
               </div>
               <Separator />
               <div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
@@ -120,32 +121,37 @@ export default async function ProductDetails(props: {
                     Out of Stock
                   </div>
                 )}
-                 {product.countInStock !== 0 && (
-                    <div className='flex justify-center items-center'>
-                      <AddToCart
-                        item={{
-                          clientId: generateId(),
-                          product: product._id,
-                          countInStock: product.countInStock,
-                          name: product.name,
-                          slug: product.slug,
-                          category: product.category,
-                          price: round2(product.price),
-                          quantity: 1,
-                          image: product.images[0],
-                          size: size || product.sizes[0],
-                          color: color || product.colors[0],
-                        }}
-                      />
-                    </div>
-                  )}
+                {product.countInStock !== 0 && (
+                  <div className='flex justify-center items-center'>
+                    <AddToCart
+                      item={{
+                        clientId: generateId(),
+                        product: product._id,
+                        countInStock: product.countInStock,
+                        name: product.name,
+                        slug: product.slug,
+                        category: product.category,
+                        price: round2(product.price),
+                        quantity: 1,
+                        image: product.images[0],
+                        size: size || product.sizes[0],
+                        color: color || product.colors[0],
+                      }}
+                    />
+                    <AddToWishlistButton
+                      productId={product._id}
+                      variant="icon"
+                      size="md"
+                      className="ml-2"
+                    />
+                  </div>
+                )}
               </CardContent>
             </Card>
-            
           </div>
         </div>
       </section>
-     <section className='mt-10'>
+      <section className='mt-10'>
         <h2 className='h2-bold mb-2' id='reviews'>
           Customer Reviews
         </h2>

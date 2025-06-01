@@ -124,10 +124,10 @@ export default async function SearchPage(props: {
             : `${data.from}-${data.to} of ${data.totalProducts}`}{' '}
           results
           {(q !== 'all' && q !== '') ||
-          (category !== 'all' && category !== '') ||
-          (tag !== 'all' && tag !== '') ||
-          rating !== 'all' ||
-          price !== 'all'
+            (category !== 'all' && category !== '') ||
+            (tag !== 'all' && tag !== '') ||
+            rating !== 'all' ||
+            price !== 'all'
             ? ` for `
             : null}
           {q !== 'all' && q !== '' && '"' + q + '"'}
@@ -137,10 +137,10 @@ export default async function SearchPage(props: {
           {rating !== 'all' && `   Rating: ` + rating + ` & up`}
           &nbsp;
           {(q !== 'all' && q !== '') ||
-          (category !== 'all' && category !== '') ||
-          (tag !== 'all' && tag !== '') ||
-          rating !== 'all' ||
-          price !== 'all' ? (
+            (category !== 'all' && category !== '') ||
+            (tag !== 'all' && tag !== '') ||
+            rating !== 'all' ||
+            price !== 'all' ? (
             <Button variant={'link'} asChild>
               <Link href='/search'>Clear</Link>
             </Button>
@@ -162,9 +162,8 @@ export default async function SearchPage(props: {
               <ul>
                 <li>
                   <Link
-                    className={`${
-                      ('all' === category || '' === category) && 'text-primary'
-                    }`}
+                    className={`${('all' === category || '' === category) && 'text-primary'
+                      }`}
                     href={getFilterUrl({ category: 'all', params })}
                   >
                     All
@@ -234,9 +233,8 @@ export default async function SearchPage(props: {
               <ul>
                 <li>
                   <Link
-                    className={`${
-                      ('all' === tag || '' === tag) && 'text-primary'
-                    }`}
+                    className={`${('all' === tag || '' === tag) && 'text-primary'
+                      }`}
                     href={getFilterUrl({ tag: 'all', params })}
                   >
                     All
@@ -269,8 +267,8 @@ export default async function SearchPage(props: {
               <ProductCard key={product._id} product={product} />
             ))}
           </div>
-          {data!.totalPages! > 1 && (
-            <Pagination page={page} totalPages={data!.totalPages} />
+          {data.totalPages > 1 && (
+            <Pagination page={page} totalPages={data.totalPages} />
           )}
         </div>
       </div>

@@ -62,3 +62,5 @@ export const SENDER_NAME = process.env.SENDER_NAME || APP_NAME
       freeShippingMinPrice: 35,
     },
   ]
+
+  export const USER_ROLES = ['Admin', 'User']
