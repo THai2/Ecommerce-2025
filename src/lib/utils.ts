@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import qs from 'query-string'
@@ -74,14 +75,16 @@ export function calculateFutureDate(days: number) {
   currentDate.setDate(currentDate.getDate() + days)
   return currentDate
 }
-export function getMonthName(yearAndMonth: string) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [year, monthNumber] = yearAndMonth.split('-')
-  const date = new Date()
-  date.setMonth(parseInt(monthNumber) - 1)
-  return new Date().getMonth() === parseInt(monthNumber) - 1
-    ? `${date.toLocaleString('default', { month: 'long' })} (ongoing)`
-    : date.toLocaleString('default', { month: 'long' })
+export function getMonthName(yearMonth: string): string {
+  const [year, month] = yearMonth.split('-').map(Number)
+  const date = new Date(year, month - 1)
+  const monthName = date.toLocaleString('default', { month: 'long' })
+  const now = new Date()
+
+  if (year === now.getFullYear() && month === now.getMonth() + 1) {
+    return `${monthName} Ongoing`
+  }
+  return monthName
 }
 export function calculatePastDate(days: number) {
   const currentDate = new Date()
@@ -202,3 +205,43 @@ export const getFilterUrl = ({
   if (sort) newParams.sort = sort
   return `/search?${new URLSearchParams(newParams).toString()}`
 }
+
+
+export function isMatch(pathname: string, patterns: string[]): boolean {
+  return patterns.some(pattern => {
+    if (pattern.includes("(.*)")) {
+      // Handle regex patterns
+      const regexPattern = pattern.replace("(.*)", ".*");
+      const regex = new RegExp(`^${regexPattern}$`);
+      return regex.test(pathname);
+    }
+    
+    // Exact match
+    return pathname === pattern;
+  });
+}
+
+export const publicPaths: string[] = [
+  "/",
+  "/login", 
+  "/register",
+  "/about",
+  "/contact", 
+  "/blog",
+  "/blog/(.*)", // Regex pattern for dynamic routes
+  "/product/(.*)",
+  "/search",
+  "/page/(.*)",
+];
+
+export const protectedPaths: string[] = [
+  "/dashboard",
+  "/profile", 
+  "/admin", 
+  "/admin/(.*)",
+  "/settings",
+  "/orders",
+  "/orders/(.*)",
+];
+
+

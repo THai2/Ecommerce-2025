@@ -1,6 +1,16 @@
-import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
+import type { NextConfig } from 'next'
+import withNextIntl from 'next-intl/plugin'
+
+const nextConfig: NextConfig = withNextIntl()({
+  /* config options here */
+    webpack(config) {
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ["@svgr/webpack"],
+    });
+    return config;
+  },
   images: {
     remotePatterns: [
       {
@@ -11,14 +21,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  /* config options here */
-  webpack(config) {
-    config.module.rules.push({
-      test: /\.svg$/,
-      use: ["@svgr/webpack"],
-    });
-    return config;
-  },
-};
+})
 
-export default nextConfig;
+export default nextConfig

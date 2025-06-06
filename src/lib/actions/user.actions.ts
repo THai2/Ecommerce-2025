@@ -8,7 +8,7 @@ import bcrypt from 'bcryptjs'
 import { formatError } from '../utils'
 import User, { IUser } from '@/models/user'
 import { revalidatePath } from 'next/cache'
-import { PAGE_SIZE } from '../constants'
+import { getSetting } from './setting.actions'
 import { z } from 'zod'
 
 export async function signInWithCredentials(user: IUserSignIn) {
@@ -84,7 +84,11 @@ export async function getAllUsers({
   limit?: number
   page: number
 }) {
-  limit = limit || PAGE_SIZE
+  const {
+    common: { pageSize },
+  } = await getSetting()
+  limit = limit || pageSize
+
   await connectToDatabase()
 
   const skipAmount = (Number(page) - 1) * limit

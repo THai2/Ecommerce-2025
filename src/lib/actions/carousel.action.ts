@@ -1,13 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use server'
 
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { connectToDatabase } from '@/lib/db'
 import { formatError } from '@/lib/utils'
-import { PAGE_SIZE } from '@/lib/constants'
 import { CarouselInputSchema, CarouselUpdateSchema } from '../validator'
 import { ICarouselInput } from '@/types'
 import Carousel, { ICarousel } from '@/models/carousel'
+import { getSetting } from './setting.actions'
 
 
 // CREATE
@@ -79,7 +80,10 @@ export async function getAllCarouselsForAdmin({
 }) {
   await connectToDatabase()
 
-  const pageSize = limit || PAGE_SIZE
+   const {
+    common: { pageSize },
+  } = await getSetting()
+  limit = limit || pageSize
   const queryFilter =
     query && query !== 'all'
       ? {
@@ -122,7 +126,10 @@ export async function getAllPublishedCarousels({
   limit?: number
   page?: number
 } = {}) {
-  limit = limit || PAGE_SIZE
+   const {
+    common: { pageSize },
+  } = await getSetting()
+  limit = limit || pageSize
   await connectToDatabase()
 
   const carousels = await Carousel.find({ isPublished: true })

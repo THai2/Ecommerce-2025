@@ -1,4 +1,4 @@
-import { CarouselInputSchema, CartSchema, OrderInputSchema, OrderItemSchema, ProductInputSchema, ReviewInputSchema, ShippingAddressSchema, UserInputSchema, UserNameSchema, UserSignInSchema, UserSignUpSchema, WebPageInputSchema } from '@/lib/validator'
+import { CarouselInputSchema, CarouselSchema, CartSchema, DeliveryDateSchema, OrderInputSchema, OrderItemSchema, PaymentMethodSchema, ProductInputSchema, ReviewInputSchema, SettingInputSchema, ShippingAddressSchema, SiteCurrencySchema, SiteLanguageSchema, UserInputSchema, UserNameSchema, UserSignInSchema, UserSignUpSchema, WebPageInputSchema } from '@/lib/validator'
 import { z } from 'zod'
 
 //Review
@@ -10,6 +10,7 @@ export type IReviewDetails = IReviewInput & {
     name: string
   }
 }
+
 
 //Product
 export type IProductInput = z.infer<typeof ProductInputSchema>
@@ -32,6 +33,7 @@ export type Data = {
   }[]
   carousels: ICarouselInput[]
   webPages: IWebPageInput[]
+  settings: ISettingInput[]
 }
 
 //Order
@@ -63,3 +65,15 @@ export interface IWishlistInput {
 
 // webpage
 export type IWebPageInput = z.infer<typeof WebPageInputSchema>
+
+
+// setting
+export type ICarousel = z.infer<typeof CarouselSchema>
+export type ISettingInput = z.infer<typeof SettingInputSchema>
+export type ClientSetting = ISettingInput & {
+  currency: string
+}
+export type SiteLanguage = z.infer<typeof SiteLanguageSchema>
+export type SiteCurrency = z.infer<typeof SiteCurrencySchema>
+export type PaymentMethod = z.infer<typeof PaymentMethodSchema>
+export type DeliveryDate = z.infer<typeof DeliveryDateSchema>

@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 import { Cart, OrderItem, ShippingAddress } from '@/types'
-import { calcDeliveryDateAndPrice } from '@/services/order-service'
+import { calcDeliveryDateAndPrice } from '@/lib/actions/order.actions'
 
 const initialState: Cart = {
   items: [],
@@ -18,14 +18,12 @@ const initialState: Cart = {
 interface CartState {
   cart: Cart
   addItem: (item: OrderItem, quantity: number) => Promise<string>
-
   updateItem: (item: OrderItem, quantity: number) => Promise<void>
-     removeItem: (item: OrderItem) => void
-     clearCart: () => void
-     setShippingAddress: (shippingAddress: ShippingAddress) => Promise<void>
+  removeItem: (item: OrderItem) => void
+  clearCart: () => void
+  setShippingAddress: (shippingAddress: ShippingAddress) => Promise<void>
   setPaymentMethod: (paymentMethod: string) => void
   setDeliveryDateIndex: (index: number) => Promise<void>
-  
 }
 
 const useCartStore = create(
@@ -152,7 +150,7 @@ const useCartStore = create(
       },
       setDeliveryDateIndex: async (index: number) => {
         const { items, shippingAddress } = get().cart
-  
+
         set({
           cart: {
             ...get().cart,
@@ -174,7 +172,7 @@ const useCartStore = create(
       },
       init: () => set({ cart: initialState }),
     }),
-    
+
     {
       name: 'cart-store',
     }

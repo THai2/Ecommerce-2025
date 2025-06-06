@@ -3,16 +3,32 @@
 import { ChevronUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { APP_NAME } from '@/lib/constants'
+import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardFooter } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { Badge } from '@/components/ui/badge'
+import useSettingStore from '@/hooks/use-setting-store'
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
+import { SelectValue } from '@radix-ui/react-select'
+import { useLocale, useTranslations } from 'next-intl'
+import { usePathname, useRouter } from '../../i18n/routing'
+import { i18n } from '../../../i18n-config'
+
 
 export default function Footer() {
   const [isVisible, setIsVisible] = useState(false);
   const footerRef = useRef(null);
+  
+  const router = useRouter()
+  const pathname = usePathname()
+  const {
+    setting: { site, availableCurrencies, currency },
+    setCurrency,
+  } = useSettingStore()
+  const { locales } = i18n
+
+  const locale = useLocale()
+  const t = useTranslations()
   
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -73,46 +89,26 @@ export default function Footer() {
               <ChevronUp className="h-5 w-5 transition-transform duration-500 group-hover:-translate-y-1" />
               <div className="absolute -inset-1 rounded-full bg-primary/20 animate-ping opacity-0 group-hover:opacity-100" />
             </div>
-            <span className="font-medium tracking-wide">BACK TO TOP</span>
+            <span className="font-medium tracking-wide">{t('Footer.Back to top')}</span>
           </div>
         </Button>
       </div>
       
       {/* Main Footer Content */}
       <div className={`relative z-10 max-w-7xl mx-auto px-4 pt-16 pb-12 transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Company Info */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Get to Know Us */}
           <Card className={`border-0 shadow-none bg-transparent transition-all duration-700 ${isVisible ? 'translate-x-0' : 'translate-x-10 opacity-0'}`}>
             <CardContent className="p-0 space-y-6">
               <div className="relative inline-block">
-                <h2 className="text-2xl font-bold tracking-tight">{APP_NAME}</h2>
-                <div className={`absolute h-1 w-0 bg-primary bottom-0 left-0 transform translate-y-2 transition-all duration-1000 ${isVisible ? 'w-20' : ''}`} />
-              </div>
-              <p className="text-muted-foreground leading-relaxed">
-                Leading the industry with innovative solutions since 2000.
-                Our mission is to provide excellence through creativity and technology.
-              </p>
-            </CardContent>
-            <CardFooter className="p-0 pt-4">
-              <p className="text-sm text-muted-foreground">
-                © 2000-2024, {APP_NAME}, Inc. or its affiliates
-              </p>
-            </CardFooter>
-          </Card>
-          
-          {/* Quick Links */}
-          <Card className={`border-0 shadow-none bg-transparent transition-all duration-700 delay-100 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-            <CardContent className="p-0 space-y-6">
-              <div className="relative inline-block">
-                <h3 className="text-xl font-bold tracking-tight">Quick Links</h3>
+                <h3 className="text-xl font-bold tracking-tight">{t('Footer.Get to Know Us')}</h3>
                 <div className={`absolute h-1 w-0 bg-primary bottom-0 left-0 transform translate-y-2 transition-all duration-1000 ${isVisible ? 'w-16' : ''}`} />
               </div>
               <ul className="space-y-3">
                 {[
-                  { href: '/page/conditions-of-use', text: 'Conditions of Use' },
-                  { href: '/page/privacy-policy', text: 'Privacy Notice' },
-                  { href: '/page/help', text: 'Help Center' },
-                  { href: '/page/careers', text: 'Careers' }
+                  { href: '/page/careers', text: t('Footer.Careers') },
+                  { href: '/page/blog', text: t('Footer.Blog') },
+                  { href: '/page/about-us', text: t('Footer.About name', { name: site.name }) }
                 ].map((link, index) => (
                   <li key={index} className="overflow-hidden">
                     <Link 
@@ -132,103 +128,149 @@ export default function Footer() {
             </CardContent>
           </Card>
           
-          {/* Newsletter Signup */}
-          <Card className={`border-0 shadow-none bg-transparent transition-all duration-700 delay-200 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+          {/* Make Money with Us */}
+          <Card className={`border-0 shadow-none bg-transparent transition-all duration-700 delay-100 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
             <CardContent className="p-0 space-y-6">
               <div className="relative inline-block">
-                <h3 className="text-xl font-bold tracking-tight">Stay Updated</h3>
+                <h3 className="text-xl font-bold tracking-tight">{t('Footer.Make Money with Us')}</h3>
                 <div className={`absolute h-1 w-0 bg-primary bottom-0 left-0 transform translate-y-2 transition-all duration-1000 ${isVisible ? 'w-16' : ''}`} />
               </div>
-              <p className="text-muted-foreground text-sm">
-                Subscribe to our newsletter for the latest updates and offers.
-              </p>
-              <div className="relative mt-2 group">
-                <Input
-                  type="email" 
-                  placeholder="Your email address" 
-                  className="bg-secondary border-0 border-b-2 border-muted group-hover:border-primary focus:border-primary transition-colors duration-300 pr-10"
-                />
-                <button className="absolute right-0 top-0 p-2 text-muted-foreground hover:text-primary transition-colors duration-300">
-                  <ChevronUp className="h-5 w-5 rotate-90" />
-                </button>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                We respect your privacy. Unsubscribe at any time.
-              </p>
+              <ul className="space-y-3">
+                {[
+                  { href: '/page/sell', text: t('Footer.Sell products on', { name: site.name }) },
+                  { href: '/page/become-affiliate', text: t('Footer.Become an Affiliate') },
+                  { href: '/page/advertise', text: t('Footer.Advertise Your Products') }
+                ].map((link, index) => (
+                  <li key={index} className="overflow-hidden">
+                    <Link 
+                      href={link.href} 
+                      className="group flex items-center text-muted-foreground hover:text-primary transition-all duration-300"
+                    >
+                      <span className="w-0 group-hover:w-6 overflow-hidden transition-all duration-300 h-5 flex items-center">
+                        <span className="transform translate-x-2">→</span>
+                      </span>
+                      <span className="group-hover:border-b group-hover:border-primary pb-1 transition-all duration-300">
+                        {link.text}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </CardContent>
           </Card>
           
-          {/* Contact */}
-          <Card className={`border-0 shadow-none bg-transparent transition-all duration-700 delay-300 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+          {/* Let Us Help You */}
+          <Card className={`border-0 shadow-none bg-transparent transition-all duration-700 delay-200 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
             <CardContent className="p-0 space-y-6">
               <div className="relative inline-block">
-                <h3 className="text-xl font-bold tracking-tight">Get in Touch</h3>
+                <h3 className="text-xl font-bold tracking-tight">{t('Footer.Let Us Help You')}</h3>
                 <div className={`absolute h-1 w-0 bg-primary bottom-0 left-0 transform translate-y-2 transition-all duration-1000 ${isVisible ? 'w-16' : ''}`} />
               </div>
-              <address className="not-italic text-sm text-muted-foreground space-y-4">
+              <ul className="space-y-3">
                 {[
-                  {
-                    icon: <ChevronUp className="h-4 w-4 rotate-45" />,
-                    text: '123, Main Street, Anytown, CA, 12345'
-                  },
-                  {
-                    icon: <ChevronUp className="h-4 w-4 -rotate-[135deg]" />,
-                    text: '+1 (123) 456-7890'
-                  },
-                  {
-                    icon: <ChevronUp className="h-4 w-4 rotate-180" />,
-                    text: `contact@${APP_NAME.toLowerCase()}.com`
-                  }
-                ].map((item, index) => (
-                  <div key={index} className="flex items-center group">
-                    <Badge className="w-8 h-8 rounded-full bg-secondary hover:bg-primary/90 flex items-center justify-center mr-3 transition-colors duration-300">
-                      {item.icon}
-                    </Badge>
-                    <span className="group-hover:text-primary transition-colors duration-300">
-                      {item.text}
-                    </span>
-                  </div>
+                  { href: '/page/shipping', text: t('Footer.Shipping Rates & Policies') },
+                  { href: '/page/returns-policy', text: t('Footer.Returns & Replacements') },
+                  { href: '/page/help', text: t('Footer.Help') }
+                ].map((link, index) => (
+                  <li key={index} className="overflow-hidden">
+                    <Link 
+                      href={link.href} 
+                      className="group flex items-center text-muted-foreground hover:text-primary transition-all duration-300"
+                    >
+                      <span className="w-0 group-hover:w-6 overflow-hidden transition-all duration-300 h-5 flex items-center">
+                        <span className="transform translate-x-2">→</span>
+                      </span>
+                      <span className="group-hover:border-b group-hover:border-primary pb-1 transition-all duration-300">
+                        {link.text}
+                      </span>
+                    </Link>
+                  </li>
                 ))}
-              </address>
+              </ul>
             </CardContent>
           </Card>
         </div>
         
-        {/* Social Media & Final Note */}
-        <div className={`mt-16 pt-8 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+        {/* Language and Currency Selection */}
+        <div className={`mt-16 pt-8 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
           <Separator className="mb-8" />
-          <div className="flex flex-wrap justify-center gap-6">
-            {/* Social Media Icons */}
-            {[
-              { name: 'Facebook', icon: 'M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z' },
-              { name: 'Instagram', icon: 'M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z' },
-              { name: 'Twitter', icon: 'M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84' },
-              { name: 'GitHub', icon: 'M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z' },
-              { name: 'LinkedIn', icon: 'M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z' }
-            ].map((social, index) => (
-              <Button 
-                key={index}
-                variant="ghost"
-                size="icon"
-                className={`group transition-all duration-700 hover:bg-primary hover:text-primary-foreground ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-                aria-label={social.name}
+          <div className="flex flex-col items-center space-y-4">
+            <div className="flex items-center space-x-4 flex-wrap md:flex-nowrap">
+              <Image
+                src={site.logo}
+                alt={`${site.name} logo`}
+                width={48}
+                height={48}
+                className='w-14'
+                style={{
+                  maxWidth: '100%',
+                  height: 'auto',
+                }}
+              />
+              <Select
+                value={locale}
+                onValueChange={(value) => {
+                  router.push(pathname, { locale: value })
+                }}
               >
-                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path fillRule="evenodd" d={social.icon} clipRule="evenodd" />
-                </svg>
-              </Button>
-            ))}
+                <SelectTrigger>
+                  <SelectValue placeholder={t('Footer.Select a language')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {locales.map((lang, index) => (
+                    <SelectItem key={index} value={lang.code}>
+                      <Link
+                        className='w-full flex items-center gap-1'
+                        href={pathname}
+                        locale={lang.code}
+                      >
+                        <span className='text-lg'>{lang.icon}</span> {lang.name}
+                      </Link>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={currency}
+                onValueChange={(value) => {
+                  setCurrency(value)
+                  window.scrollTo(0, 0)
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t('Footer.Select a currency')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableCurrencies
+                    .filter((x) => x.code)
+                    .map((currency, index) => (
+                      <SelectItem key={index} value={currency.code}>
+                        {currency.name} ({currency.code})
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+        
+        {/* Bottom Links and Copyright */}
+        <div className={`mt-8 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="flex flex-wrap justify-center gap-6 mb-4">
+            <Link href='/page/conditions-of-use' className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300">
+              {t('Footer.Conditions of Use')}
+            </Link>
+            <Link href='/page/privacy-policy' className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300">
+              {t('Footer.Privacy Notice')}
+            </Link>
+            <Link href='/page/help' className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300">
+              {t('Footer.Help')}
+            </Link>
           </div>
           
-          <div className={`mt-8 text-center transition-all duration-1000 delay-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-            <div className="inline-flex items-center space-x-2">
-              <span className="text-xs text-muted-foreground">Made with</span>
-              <div className="relative w-6 h-6 flex items-center justify-center">
-                <span className="absolute animate-ping opacity-75 text-primary">♥</span>
-                <span className="relative text-primary">♥</span>
-              </div>
-              <span className="text-xs text-muted-foreground">by the {APP_NAME} team</span>
-            </div>
+          <div className="text-center space-y-2">
+            <p className="text-sm text-muted-foreground">© {site.copyright}</p>
+            <p className="text-sm text-muted-foreground">{site.address} | {site.phone}</p>
           </div>
         </div>
       </div>

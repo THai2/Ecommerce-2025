@@ -2,22 +2,22 @@
 
 import mongoose from 'mongoose'
 import { revalidatePath } from 'next/cache'
-
+import { z } from 'zod'
+import Review, { IReview } from '@/models/review'
+import Product from '@/models/product'
 
 import { connectToDatabase } from '../db'
 import { formatError } from '../utils'
 import { ReviewInputSchema } from '../validator'
-import { IReviewDetails, IReviewInput } from '@/types'
-import { PAGE_SIZE } from '../constants'
+import { IReviewDetails } from '@/types'
+import { getSetting } from './setting.actions'
 import { auth } from '../../../auth'
-import Review, { IReview } from '@/models/review'
-import Product from '@/models/product'
 
 export async function createUpdateReview({
   data,
   path,
 }: {
-  data: IReviewInput
+  data: z.infer<typeof ReviewInputSchema>
   path: string
 }) {
   try {
@@ -47,6 +47,7 @@ export async function createUpdateReview({
       return {
         success: true,
         message: 'Review updated successfully',
+        // data: JSON.parse(JSON.stringify(existReview)),
       }
     } else {
       await Review.create(review)
@@ -55,6 +56,7 @@ export async function createUpdateReview({
       return {
         success: true,
         message: 'Review created successfully',
+        // data: JSON.parse(JSON.stringify(newReview)),
       }
     }
   } catch (error) {
@@ -108,7 +110,10 @@ export async function getReviews({
   limit?: number
   page: number
 }) {
-  limit = limit || PAGE_SIZE
+  const {
+    common: { pageSize },
+  } = await getSetting()
+  limit = limit || pageSize
   await connectToDatabase()
   const skipAmount = (page - 1) * limit
   const reviews = await Review.find({ product: productId })
@@ -118,7 +123,6 @@ export async function getReviews({
     })
     .skip(skipAmount)
     .limit(limit)
-  console.log(reviews)
   const reviewsCount = await Review.countDocuments({ product: productId })
   return {
     data: JSON.parse(JSON.stringify(reviews)) as IReviewDetails[],

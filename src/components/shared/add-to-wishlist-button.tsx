@@ -5,6 +5,8 @@ import { Heart } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+
+import {  useTranslations } from 'next-intl'
 import { addToWishlist, removeFromWishlist, checkInWishlist } from '@/lib/actions/wishlist.action'
 
 interface AddToWishlistButtonProps {
@@ -25,6 +27,8 @@ export function AddToWishlistButton({
   const [inWishlist, setInWishlist] = useState(initialInWishlist)
   const [isPending, startTransition] = useTransition()
   const [isChecking, setIsChecking] = useState(true)
+
+    const t = useTranslations()
 
   // Check wishlist status on component mount
   useEffect(() => {
@@ -49,22 +53,22 @@ export function AddToWishlistButton({
           const result = await removeFromWishlist(productId)
           if (result.success) {
             setInWishlist(false)
-            toast.success('Removed from wishlist')
+            toast.success(t('Wishlist.Removed from wishlist'))
           } else {
-            toast.error(result.message || 'Failed to remove from wishlist')
+            toast.error(result.message || t('Wishlist.Failed to remove from wishlist'))
           }
         } else {
           const result = await addToWishlist(productId)
           if (result.success) {
             setInWishlist(true)
-            toast.success('Added to wishlist')
+            toast.success(t('Wishlist.Added to wishlist'))
           } else {
-            toast.error(result.message || 'Failed to add to wishlist')
+            toast.error(result.message || t('Wishlist.Failed to add to wishlist'))
           }
         }
       } catch (error) {
         console.error('Wishlist operation failed:', error)
-        toast.error('An error occurred. Please try again.')
+        toast.error(t('Wishlist.An error occurred. Please try again.'))
       }
     })
   }

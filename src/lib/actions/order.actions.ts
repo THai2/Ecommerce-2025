@@ -1,18 +1,212 @@
 'use server'
 
+import { Cart, IOrderList, OrderItem, ShippingAddress } from '@/types'
+import { formatError, round2 } from '../utils'
+import { connectToDatabase } from '../db'
+import { OrderInputSchema } from '../validator'
 import { revalidatePath } from 'next/cache'
 import { paypal } from '../paypal'
-import Order, { IOrder } from '@/models/order'
-import { connectToDatabase } from '../db'
-import { formatError } from '../utils'
-import { sendAskReviewOrderItems, sendPurchaseReceipt } from '../../../emails'
-import { PAGE_SIZE } from '../constants'
-import { auth } from '../../../auth'
 import { DateRange } from 'react-day-picker'
-import Product from '@/models/product'
-import User from '@/models/user'
-import { IOrderList } from '@/types'
+import { getSetting } from './setting.actions'
+import Order, { IOrder } from '@/models/order'
+import { sendAskReviewOrderItems, sendPurchaseReceipt } from '../../../emails'
 import mongoose from 'mongoose'
+import Product from '@/models/product'
+import { auth } from '../../../auth'
+import User from '@/models/user'
+
+// CREATE
+export const createOrder = async (clientSideCart: Cart) => {
+  try {
+    await connectToDatabase()
+    const session = await auth()
+    if (!session) throw new Error('User not authenticated')
+    // recalculate price and delivery date on the server
+    const createdOrder = await createOrderFromCart(
+      clientSideCart,
+      session.user.id!
+    )
+    return {
+      success: true,
+      message: 'Order placed successfully',
+      data: { orderId: createdOrder._id.toString() },
+    }
+  } catch (error) {
+    return { success: false, message: formatError(error) }
+  }
+}
+export const createOrderFromCart = async (
+  clientSideCart: Cart,
+  userId: string
+) => {
+  const cart = {
+    ...clientSideCart,
+    ...calcDeliveryDateAndPrice({
+      items: clientSideCart.items,
+      shippingAddress: clientSideCart.shippingAddress,
+      deliveryDateIndex: clientSideCart.deliveryDateIndex,
+    }),
+  }
+
+  const order = OrderInputSchema.parse({
+    user: userId,
+    items: cart.items,
+    shippingAddress: cart.shippingAddress,
+    paymentMethod: cart.paymentMethod,
+    itemsPrice: cart.itemsPrice,
+    shippingPrice: cart.shippingPrice,
+    taxPrice: cart.taxPrice,
+    totalPrice: cart.totalPrice,
+    expectedDeliveryDate: cart.expectedDeliveryDate,
+  })
+  return await Order.create(order)
+}
+
+export async function updateOrderToPaid(orderId: string) {
+  try {
+    await connectToDatabase()
+    const order = await Order.findById(orderId).populate<{
+      user: { email: string; name: string }
+    }>('user', 'name email')
+    if (!order) throw new Error('Order not found')
+    if (order.isPaid) throw new Error('Order is already paid')
+    order.isPaid = true
+    order.paidAt = new Date()
+    await order.save()
+    if (!process.env.MONGODB_URI?.startsWith('mongodb://localhost'))
+      await updateProductStock(order._id)
+    if (order.user.email) await sendPurchaseReceipt({ order })
+    revalidatePath(`/account/orders/${orderId}`)
+    return { success: true, message: 'Order paid successfully' }
+  } catch (err) {
+    return { success: false, message: formatError(err) }
+  }
+}
+const updateProductStock = async (orderId: string) => {
+  const session = await mongoose.connection.startSession()
+
+  try {
+    session.startTransaction()
+    const opts = { session }
+
+    const order = await Order.findOneAndUpdate(
+      { _id: orderId },
+      { isPaid: true, paidAt: new Date() },
+      opts
+    )
+    if (!order) throw new Error('Order not found')
+
+    for (const item of order.items) {
+      const product = await Product.findById(item.product).session(session)
+      if (!product) throw new Error('Product not found')
+
+      product.countInStock -= item.quantity
+      await Product.updateOne(
+        { _id: product._id },
+        { countInStock: product.countInStock },
+        opts
+      )
+    }
+    await session.commitTransaction()
+    session.endSession()
+    return true
+  } catch (error) {
+    await session.abortTransaction()
+    session.endSession()
+    throw error
+  }
+}
+export async function deliverOrder(orderId: string) {
+  try {
+    await connectToDatabase()
+    const order = await Order.findById(orderId).populate<{
+      user: { email: string; name: string }
+    }>('user', 'name email')
+    if (!order) throw new Error('Order not found')
+    if (!order.isPaid) throw new Error('Order is not paid')
+    order.isDelivered = true
+    order.deliveredAt = new Date()
+    await order.save()
+    if (order.user.email) await sendAskReviewOrderItems({ order })
+    revalidatePath(`/account/orders/${orderId}`)
+    return { success: true, message: 'Order delivered successfully' }
+  } catch (err) {
+    return { success: false, message: formatError(err) }
+  }
+}
+
+// DELETE
+export async function deleteOrder(id: string) {
+  try {
+    await connectToDatabase()
+    const res = await Order.findByIdAndDelete(id)
+    if (!res) throw new Error('Order not found')
+    revalidatePath('/admin/orders')
+    return {
+      success: true,
+      message: 'Order deleted successfully',
+    }
+  } catch (error) {
+    return { success: false, message: formatError(error) }
+  }
+}
+
+// GET ALL ORDERS
+
+export async function getAllOrders({
+  limit,
+  page,
+}: {
+  limit?: number
+  page: number
+}) {
+  const {
+    common: { pageSize },
+  } = await getSetting()
+  limit = limit || pageSize
+  await connectToDatabase()
+  const skipAmount = (Number(page) - 1) * limit
+  const orders = await Order.find()
+    .populate('user', 'name')
+    .sort({ createdAt: 'desc' })
+    .skip(skipAmount)
+    .limit(limit)
+  const ordersCount = await Order.countDocuments()
+  return {
+    data: JSON.parse(JSON.stringify(orders)) as IOrderList[],
+    totalPages: Math.ceil(ordersCount / limit),
+  }
+}
+export async function getMyOrders({
+  limit,
+  page,
+}: {
+  limit?: number
+  page: number
+}) {
+  const {
+    common: { pageSize },
+  } = await getSetting()
+  limit = limit || pageSize
+  await connectToDatabase()
+  const session = await auth()
+  if (!session) {
+    throw new Error('User is not authenticated')
+  }
+  const skipAmount = (Number(page) - 1) * limit
+  const orders = await Order.find({
+    user: session?.user?.id,
+  })
+    .sort({ createdAt: 'desc' })
+    .skip(skipAmount)
+    .limit(limit)
+  const ordersCount = await Order.countDocuments({ user: session?.user?.id })
+
+  return {
+    data: JSON.parse(JSON.stringify(orders)),
+    totalPages: Math.ceil(ordersCount / limit),
+  }
+}
 export async function getOrderById(orderId: string): Promise<IOrder> {
   await connectToDatabase()
   const order = await Order.findById(orderId)
@@ -82,34 +276,52 @@ export async function approvePayPalOrder(
   }
 }
 
-// GET
-export async function getMyOrders({
-    limit,
-    page,
-  }: {
-    limit?: number
-    page: number
-  }) {
-    limit = limit || PAGE_SIZE
-    await connectToDatabase()
-    const session = await auth()
-    if (!session) {
-      throw new Error('User is not authenticated')
-    }
-    const skipAmount = (Number(page) - 1) * limit
-    const orders = await Order.find({
-      user: session?.user?.id,
-    })
-      .sort({ createdAt: 'desc' })
-      .skip(skipAmount)
-      .limit(limit)
-    const ordersCount = await Order.countDocuments({ user: session?.user?.id })
-  
-    return {
-      data: JSON.parse(JSON.stringify(orders)),
-      totalPages: Math.ceil(ordersCount / limit),
-    }
+export const calcDeliveryDateAndPrice = async ({
+  items,
+  shippingAddress,
+  deliveryDateIndex,
+}: {
+  deliveryDateIndex?: number
+  items: OrderItem[]
+  shippingAddress?: ShippingAddress
+}) => {
+  const { availableDeliveryDates } = await getSetting()
+  const itemsPrice = round2(
+    items.reduce((acc, item) => acc + item.price * item.quantity, 0)
+  )
+
+  const deliveryDate =
+    availableDeliveryDates[
+      deliveryDateIndex === undefined
+        ? availableDeliveryDates.length - 1
+        : deliveryDateIndex
+    ]
+  const shippingPrice =
+    !shippingAddress || !deliveryDate
+      ? undefined
+      : deliveryDate.freeShippingMinPrice > 0 &&
+          itemsPrice >= deliveryDate.freeShippingMinPrice
+        ? 0
+        : deliveryDate.shippingPrice
+
+  const taxPrice = !shippingAddress ? undefined : round2(itemsPrice * 0.15)
+  const totalPrice = round2(
+    itemsPrice +
+      (shippingPrice ? round2(shippingPrice) : 0) +
+      (taxPrice ? round2(taxPrice) : 0)
+  )
+  return {
+    availableDeliveryDates,
+    deliveryDateIndex:
+      deliveryDateIndex === undefined
+        ? availableDeliveryDates.length - 1
+        : deliveryDateIndex,
+    itemsPrice,
+    shippingPrice,
+    taxPrice,
+    totalPrice,
   }
+}
 
 // GET ORDERS BY USER
 export async function getOrderSummary(date: DateRange) {
@@ -186,10 +398,14 @@ export async function getOrderSummary(date: DateRange) {
   const topSalesCategories = await getTopSalesCategories(date)
   const topSalesProducts = await getTopSalesProducts(date)
 
+  const {
+    common: { pageSize },
+  } = await getSetting()
+  const limit = pageSize
   const latestOrders = await Order.find()
     .populate('user', 'name')
     .sort({ createdAt: 'desc' })
-    .limit(PAGE_SIZE)
+    .limit(limit)
   return {
     ordersCount,
     productsCount,
@@ -321,118 +537,4 @@ async function getTopSalesCategories(date: DateRange, limit = 5) {
   ])
 
   return result
-}
-
-// DELETE
-export async function deleteOrder(id: string) {
-  try {
-    await connectToDatabase()
-    const res = await Order.findByIdAndDelete(id)
-    if (!res) throw new Error('Order not found')
-    revalidatePath('/admin/orders')
-    return {
-      success: true,
-      message: 'Order deleted successfully',
-    }
-  } catch (error) {
-    return { success: false, message: formatError(error) }
-  }
-}
-
-// GET ALL ORDERS
-
-export async function getAllOrders({
-  limit,
-  page,
-}: {
-  limit?: number
-  page: number
-}) {
-  limit = limit || PAGE_SIZE
-  await connectToDatabase()
-  const skipAmount = (Number(page) - 1) * limit
-  const orders = await Order.find()
-    .populate('user', 'name')
-    .sort({ createdAt: 'desc' })
-    .skip(skipAmount)
-    .limit(limit)
-  const ordersCount = await Order.countDocuments()
-  return {
-    data: JSON.parse(JSON.stringify(orders)) as IOrderList[],
-    totalPages: Math.ceil(ordersCount / limit),
-  }
-}
-
-// UPDATE INFORMATION
-export async function updateOrderToPaid(orderId: string) {
-  try {
-    await connectToDatabase()
-    const order = await Order.findById(orderId).populate<{
-      user: { email: string; name: string }
-    }>('user', 'name email')
-    if (!order) throw new Error('Order not found')
-    if (order.isPaid) throw new Error('Order is already paid')
-    order.isPaid = true
-    order.paidAt = new Date()
-    await order.save()
-    if (!process.env.MONGODB_URI?.startsWith('mongodb://localhost'))
-      await updateProductStock(order._id)
-    if (order.user.email) await sendPurchaseReceipt({ order })
-    revalidatePath(`/account/orders/${orderId}`)
-    return { success: true, message: 'Order paid successfully' }
-  } catch (err) {
-    return { success: false, message: formatError(err) }
-  }
-}
-const updateProductStock = async (orderId: string) => {
-  const session = await mongoose.connection.startSession()
-
-  try {
-    session.startTransaction()
-    const opts = { session }
-
-    const order = await Order.findOneAndUpdate(
-      { _id: orderId },
-      { isPaid: true, paidAt: new Date() },
-      opts
-    )
-    if (!order) throw new Error('Order not found')
-
-    for (const item of order.items) {
-      const product = await Product.findById(item.product).session(session)
-      if (!product) throw new Error('Product not found')
-
-      product.countInStock -= item.quantity
-      await Product.updateOne(
-        { _id: product._id },
-        { countInStock: product.countInStock },
-        opts
-      )
-    }
-    await session.commitTransaction()
-    session.endSession()
-    return true
-  } catch (error) {
-    await session.abortTransaction()
-    session.endSession()
-    throw error
-  }
-}
-export async function deliverOrder(orderId: string) {
-  try {
-    await connectToDatabase()
-    const order = await Order.findById(orderId).populate<{
-      user: { email: string; name: string }
-    }>('user', 'name email')
-    if (!order) throw new Error('Order not found')
-    if (!order.isPaid) throw new Error('Order is not paid')
-    order.isDelivered = true
-    order.deliveredAt = new Date()
-    await order.save()
-    if (order.user.email) await sendAskReviewOrderItems({ order })
-    revalidatePath(`/account/orders/${orderId}`)
-    return { success: true, message: 'Order delivered successfully' }
-  } catch (err) {
-    return { success: false, message: formatError(err) }
-  }
 }
