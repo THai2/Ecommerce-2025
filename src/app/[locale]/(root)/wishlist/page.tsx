@@ -9,16 +9,19 @@ import { removeFromWishlist } from '@/lib/actions/wishlist.action'
 import EmptyState from '@/components/shared/empty-state'
 import { redirect } from 'next/navigation'
 import { auth } from '../../../../../auth'
+import { getTranslations } from 'next-intl/server'
+
 
 export default async function WishlistPage() {
   const session = await auth()
   
+  const t = await getTranslations()
   if (!session?.user) {
     return (
       <EmptyState
-        title="Unauthorized Access"
-        description="Please sign in to view your wishlist"
-        actionText="Sign In"
+        title= {t('Wishlist.Unauthorized Access')} 
+        description= {t('Wishlist.Please sign in to view your wishlist')} 
+        actionText= {t('Wishlist.Sign In')} 
         actionHref="/sign-in"
       />
     )
@@ -29,9 +32,9 @@ export default async function WishlistPage() {
   if (!success || !wishlist?.products || wishlist.products.length === 0) {
     return (
       <EmptyState
-        title="Your Wishlist is Empty"
-        description="Start adding products you love to your wishlist"
-        actionText="Browse Products"
+        title= {t('Wishlist.Your Wishlist is Empty')} 
+        description={t('Wishlist.Start adding products you love to your wishlist')} 
+        actionText={t('Wishlist.Browse Products')} 
         actionHref="/search?tag=todays-deal"
         icon={<Heart className="w-12 h-12 text-muted-foreground" />}
       />
@@ -48,7 +51,7 @@ export default async function WishlistPage() {
   return (
     <div className="container py-8">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Your Wishlist</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t('Wishlist.Your Wishlist')} </h1>
         <div className="flex items-center gap-4">
           <span className="text-sm text-muted-foreground">
             {wishlist.products.length} {wishlist.products.length === 1 ? 'item' : 'items'}
@@ -88,13 +91,13 @@ export default async function WishlistPage() {
                       className="text-red-500 hover:bg-red-50 hover:text-red-600"
                     >
                       <Heart className="w-5 h-5 fill-current" />
-                      <span className="sr-only">Remove from wishlist</span>
+                      <span className="sr-only">{t('Wishlist.Remove from wishlist')} </span>
                     </Button>
                   </form>
                 </div>
                 <Button asChild className="w-full mt-2">
                   <Link href={`/product/${product.slug}`}>
-                    View Product
+                    {t('Wishlist.View Product')} 
                   </Link>
                 </Button>
               </div>

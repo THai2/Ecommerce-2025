@@ -10,6 +10,22 @@ export default function SalesCategoryPieChart({ data }: { data: any[] }) {
   const { theme } = useTheme()
   const { cssColors } = useColorStore(theme)
 
+  // Use chart colors from your theme
+  const getChartColors = () => {
+    return [
+      cssColors['--chart-1'],
+      cssColors['--chart-2'], 
+      cssColors['--chart-3'],
+      cssColors['--chart-4'],
+      cssColors['--chart-5'],
+      cssColors['--primary'],
+      cssColors['--secondary'],
+      cssColors['--accent'],
+    ]
+  }
+
+  const chartColors = getChartColors()
+
   const RADIAN = Math.PI / 180
   const renderCustomizedLabel = ({
     cx,
@@ -24,17 +40,15 @@ export default function SalesCategoryPieChart({ data }: { data: any[] }) {
     const y = cy + radius * Math.sin(-midAngle * RADIAN)
 
     return (
-      <>
-        <text
-          x={x}
-          y={y}
-          textAnchor={x > cx ? 'start' : 'end'}
-          dominantBaseline='central'
-          className='text-xs'
-        >
-          {`${data[index]._id} ${data[index].totalSales} sales`}
-        </text>
-      </>
+      <text
+        x={x}
+        y={y}
+        textAnchor={x > cx ? 'start' : 'end'}
+        dominantBaseline='central'
+        className='text-xs fill-foreground'
+      >
+        {`${data[index]._id} ${data[index].totalSales} sales`}
+      </text>
     )
   }
 
@@ -48,11 +62,12 @@ export default function SalesCategoryPieChart({ data }: { data: any[] }) {
           cy='50%'
           labelLine={false}
           label={renderCustomizedLabel}
+          outerRadius={120}
         >
           {data.map((entry, index) => (
             <Cell
               key={`cell-${index}`}
-              fill={`hsl(${cssColors['--primary']})`}
+              fill={chartColors[index % chartColors.length]}
             />
           ))}
         </Pie>

@@ -21,6 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { UserSignUpSchema } from '@/lib/validator'
 import { Separator } from '@/components/ui/separator'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
+import { useTranslations } from 'next-intl'
 
 const signUpDefaultValues =
   process.env.NODE_ENV === 'development'
@@ -50,6 +51,7 @@ export default function CredentialsSignInForm() {
   })
 
   const { control, handleSubmit } = form
+  const t = useTranslations()
 
   const onSubmit = async (data: IUserSignUp) => {
     try {
@@ -67,7 +69,7 @@ export default function CredentialsSignInForm() {
       if (isRedirectError(error)) {
         throw error
       }
-      toast.error('Invalid email or password',)
+      toast.error(t('Sign-up.Invalid email or password'))
     }
   }
 
@@ -81,9 +83,9 @@ export default function CredentialsSignInForm() {
             name='name'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>{t('Sign-up.Name')}</FormLabel>
                 <FormControl>
-                  <Input placeholder='Enter name address' {...field} />
+                  <Input placeholder={t('Sign-up.Enter your name')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -97,7 +99,7 @@ export default function CredentialsSignInForm() {
               <FormItem className='w-full'>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder='Enter email address' {...field} />
+                  <Input placeholder={t('Sign-up.Enter email address')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -109,11 +111,11 @@ export default function CredentialsSignInForm() {
             name='password'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>{t('Sign-up.Password')}</FormLabel>
                 <FormControl>
                   <Input
                     type='password'
-                    placeholder='Enter password'
+                    placeholder={t('Sign-up.Enter password')}
                     {...field}
                   />
                 </FormControl>
@@ -126,11 +128,11 @@ export default function CredentialsSignInForm() {
             name='confirmPassword'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Confirm Password</FormLabel>
+                <FormLabel>{t('Sign-up.Confirm Password')}</FormLabel>
                 <FormControl>
                   <Input
                     type='password'
-                    placeholder='Confirm Password'
+                    placeholder={t('Sign-up.Confirm Password')}
                     {...field}
                   />
                 </FormControl>
@@ -139,18 +141,18 @@ export default function CredentialsSignInForm() {
             )}
           />
           <div>
-            <Button type='submit'>Sign Up</Button>
+            <Button type='submit'>{t('Sign-up.Sign up')}</Button>
           </div>
           <div className='text-sm'>
-            By creating an account, you agree to {site.name}&apos;s{' '}
-            <Link href='/page/conditions-of-use'>Conditions of Use</Link> and{' '}
-            <Link href='/page/privacy-policy'> Privacy Notice. </Link>
+            {t('Sign-up.By creating an account, you agree to')} {site.name}&apos;s{' '}
+            <Link href='/page/conditions-of-use'>{t('Sign-up.Conditions of Use')}</Link> {t('Sign-up.and')}{' '}
+            <Link href='/page/privacy-policy'> {t('Sign-up.Privacy Notice')} </Link>
           </div>
           <Separator className='mb-4' />
           <div className='text-sm'>
-            Already have an account?{' '}
+            {t('Sign-up.Already have an account?')}{' '}
             <Link className='link' href={`/sign-in?callbackUrl=${callbackUrl}`}>
-              Sign In
+              {t('Sign-up.Sign in')}
             </Link>
           </div>
         </div>

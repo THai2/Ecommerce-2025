@@ -30,7 +30,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ value }) => {
         className='bg-primary h-full transition-all duration-300 rounded-lg'
         style={{
           width: `${boundedValue}%`,
-          float: 'right', // Aligns the bar to start from the right
+          float: 'left', // Aligns the bar to start from the left
         }}
       />
     </div>

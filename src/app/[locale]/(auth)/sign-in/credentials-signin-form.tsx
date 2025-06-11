@@ -20,6 +20,7 @@ import { toast } from 'sonner'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { UserSignInSchema } from '@/lib/validator'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
+import { useTranslations } from 'next-intl'
 
 const signInDefaultValues =
   process.env.NODE_ENV === 'development'
@@ -37,6 +38,8 @@ export default function CredentialsSignInForm() {
     setting: { site },
   } = useSettingStore()
   const searchParams = useSearchParams()
+  
+  const t = useTranslations()
   const callbackUrl = searchParams.get('callbackUrl') || '/'
 
   const form = useForm<IUserSignIn>({
@@ -53,16 +56,16 @@ export default function CredentialsSignInForm() {
         password: data.password,
       })
          // Hiển thị toast thành công trước khi đăng nhập
-            toast.success('Success', {
-              description: 'Sign in successfully',
+            toast.success(t('Sign-in.Success'), {
+              description: t('Sign-in.Sign in successfully'),
             })
       redirect(callbackUrl)
     } catch (error) {
       if (isRedirectError(error)) {
         throw error
       }
-      toast.error('Error', {
-        description: 'Invalid email or password',
+      toast.error(t('Sign-in.Error'), {
+        description: t('Sign-in.Invalid email or password'),
       });
     }
   }
@@ -79,7 +82,7 @@ export default function CredentialsSignInForm() {
               <FormItem className='w-full'>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder='Enter email address' {...field} />
+                  <Input placeholder={t('Sign-in.Enter email address')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -91,11 +94,11 @@ export default function CredentialsSignInForm() {
             name='password'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>{t('Sign-in.Password')}</FormLabel>
                 <FormControl>
                   <Input
                     type='password'
-                    placeholder='Enter password'
+                    placeholder={t('Sign-in.Enter password')}
                     {...field}
                   />
                 </FormControl>
@@ -105,12 +108,12 @@ export default function CredentialsSignInForm() {
           />
 
           <div>
-            <Button type='submit'>Sign In</Button>
+            <Button type='submit'>{t('Sign-in.Sign in')}</Button>
           </div>
           <div className='text-sm'>
-            By signing in, you agree to {site.name}&apos;s{' '}
-            <Link href='/page/conditions-of-use'>Conditions of Use</Link> and{' '}
-            <Link href='/page/privacy-policy'>Privacy Notice.</Link>
+            {t('Sign-in.By signing in, you agree to')} {site.name}&apos;s{' '}
+            <Link href='/page/conditions-of-use'>{t('Sign-in.Conditions of Use')}</Link> {t('Sign-in.and')}{' '}
+            <Link href='/page/privacy-policy'>{t('Sign-in.Privacy Notice')}</Link>
           </div>
         </div>
       </form>
