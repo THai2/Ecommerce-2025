@@ -6,6 +6,7 @@ import { IProductVariant } from '@/models/product-variant'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
+import { useTranslations } from 'next-intl'
 
 interface SelectVariantProps {
   product: IProduct
@@ -22,6 +23,7 @@ export default function SelectVariant({
 }: SelectVariantProps) {
   const selectedColor = color || product.colors[0]
   const selectedSize = size || product.sizes[0]
+  const t = useTranslations()
   
   // Get current variant
   const currentVariant = variants.find(v => v.color === selectedColor)
@@ -46,7 +48,7 @@ export default function SelectVariant({
     <>
       {product.colors.length > 0 && (
         <div className='space-y-2'>
-          <div className="font-medium">Color: <span className="font-normal">{selectedColor}</span></div>
+          <div className="font-medium">{t('Product.Color:')} <span className="font-normal">{selectedColor}</span></div>
           <div className="flex flex-wrap gap-2">
             {product.colors.map((x: string) => {
               const totalStock = getTotalStockForColor(x)
@@ -80,7 +82,7 @@ export default function SelectVariant({
                       <span>{x}</span>
                       {isOutOfStock && (
                         <Badge variant="secondary" className="text-xs px-1 py-0">
-                          Out
+                          {t('Product.Out')}
                         </Badge>
                       )}
                     </div>
@@ -124,11 +126,11 @@ export default function SelectVariant({
                     <div className="flex flex-col items-center">
                       <span>{x}</span>
                       {isOutOfStock ? (
-                        <span className="text-xs text-muted-foreground">Out</span>
+                        <span className="text-xs text-muted-foreground">{t('Product.Out')}</span>
                       ) : isLowStock ? (
-                        <span className="text-xs text-orange-600">{stock} left</span>
+                        <span className="text-xs text-orange-600">{stock} {t('Product.left')}</span>
                       ) : (
-                        <span className="text-xs text-green-600">In stock</span>
+                        <span className="text-xs text-green-600">{t('Product.In stock')}</span>
                       )}
                     </div>
                   </Link>
@@ -142,11 +144,11 @@ export default function SelectVariant({
             <div className="mt-2 text-sm">
               {getStockForSize(selectedSize) > 0 ? (
                 <p className="text-green-600">
-                  {getStockForSize(selectedSize)} available in {selectedColor} - {selectedSize}
+                  {getStockForSize(selectedSize)} {t('Product.available in')} {selectedColor} - {selectedSize}
                 </p>
               ) : (
                 <p className="text-red-600">
-                  Out of stock in {selectedColor} - {selectedSize}
+                  {t('Product.Out of stock in')} {selectedColor} - {selectedSize}
                 </p>
               )}
             </div>

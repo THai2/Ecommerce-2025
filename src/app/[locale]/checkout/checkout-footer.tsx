@@ -1,11 +1,11 @@
 import useSettingStore from '@/hooks/use-setting-store'
 import Link from 'next/link'
 import React from 'react'
-
 export default function CheckoutFooter() {
   const {
     setting: { site },
   } = useSettingStore()
+  
   return (
     <div className='border-t-2 space-y-2 my-4 py-4'>
       <p>

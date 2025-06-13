@@ -141,7 +141,7 @@ export default async function ProductDetails(props: {
                   <div className='text-green-700 text-xl'>
                     {t('Product.In Stock')}
                     <span className="text-sm text-muted-foreground block">
-                      {availableStock} items available
+                      {availableStock} {t('Product.items available')}
                     </span>
                   </div>
                 ) : (

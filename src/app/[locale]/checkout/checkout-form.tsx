@@ -39,6 +39,7 @@ import useCartStore from '@/hooks/use-cart-store'
 import useSettingStore from '@/hooks/use-setting-store'
 import ProductPrice from '@/components/shared/product/product-price'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 const shippingAddressDefaultValues =
     process.env.NODE_ENV === 'development'
@@ -146,6 +147,8 @@ const CheckoutForm = () => {
     const handleSelectShippingAddress = () => {
         shippingAddressForm.handleSubmit(onSubmitShippingAddress)()
     }
+    
+    const t = useTranslations()
     const CheckoutSummary = () => (
         <Card>
             <CardContent className='p-4'>
@@ -155,11 +158,10 @@ const CheckoutForm = () => {
                             className='rounded-full w-full'
                             onClick={handleSelectShippingAddress}
                         >
-                            Ship to this address
+                            {t('Checkout.Ship to this address')}
                         </Button>
                         <p className='text-xs text-center py-2'>
-                            Choose a shipping address and payment method in order to calculate
-                            shipping, handling, and tax.
+                             {t('Checkout.Choose a shipping address and payment method in order to calculate shipping, handling, and tax')}
                         </p>
                     </div>
                 )}
@@ -169,40 +171,39 @@ const CheckoutForm = () => {
                             className='rounded-full w-full'
                             onClick={handleSelectPaymentMethod}
                         >
-                            Use this payment method
+                            {t('Checkout.Use this payment method')}
                         </Button>
 
                         <p className='text-xs text-center py-2'>
-                            Choose a payment method to continue checking out. You&apos;ll
-                            still have a chance to review and edit your order before it&apos;s
-                            final.
+                            {t('Checkout.Choose a payment method to continue checking out, You')}&apos; {t('Checkout.ll still have a chance to review and edit your order before it')}&apos;
+                            {t('Checkout.s final')}
                         </p>
                     </div>
                 )}
                 {isPaymentMethodSelected && isAddressSelected && (
                     <div>
                         <Button onClick={handlePlaceOrder} className='rounded-full w-full'>
-                            Place Your Order
+                             {t('Checkout.Place Your Order')}
                         </Button>
                         <p className='text-xs text-center py-2'>
-                            By placing your order, you agree to {site.name}&apos;s{' '}
-                            <Link href='/page/privacy-policy'>privacy notice</Link> and
-                            <Link href='/page/conditions-of-use'> conditions of use</Link>.
+                             {t('Checkout.By placing your order, you agree to')}{site.name}&apos;s{' '}
+                            <Link href='/page/privacy-policy'>{t('Checkout.privacy notice')}</Link> {t('Checkout.and')}
+                            <Link href='/page/conditions-of-use'> {t('Checkout.conditions of use')}</Link>.
                         </p>
                     </div>
                 )}
 
                 <div>
-                    <div className='text-lg font-bold'>Order Summary</div>
+                    <div className='text-lg font-bold'> {t('Checkout.Order Summary')}</div>
                     <div className='space-y-2'>
                         <div className='flex justify-between'>
-                            <span>Items:</span>
+                            <span>{t('Checkout.Items:')}</span>
                             <span>
                                 <ProductPrice price={itemsPrice} plain />
                             </span>
                         </div>
                         <div className='flex justify-between'>
-                            <span>Shipping & Handling:</span>
+                            <span>{t('Checkout.Shipping & Handling:')}</span>
                             <span>
                                 {shippingPrice === undefined ? (
                                     '--'
@@ -214,7 +215,7 @@ const CheckoutForm = () => {
                             </span>
                         </div>
                         <div className='flex justify-between'>
-                            <span> Tax:</span>
+                            <span>{t('Checkout.Tax:')}</span>
                             <span>
                                 {taxPrice === undefined ? (
                                     '--'
@@ -224,7 +225,7 @@ const CheckoutForm = () => {
                             </span>
                         </div>
                         <div className='flex justify-between  pt-4 font-bold text-lg'>
-                            <span> Order Total:</span>
+                            <span> {t('Checkout.Order Total:')}</span>
                             <span>
                                 <ProductPrice price={totalPrice} plain />
                             </span>
@@ -245,7 +246,7 @@ const CheckoutForm = () => {
                             <div className='grid grid-cols-1 md:grid-cols-12    my-3  pb-3'>
                                 <div className='col-span-5 flex text-lg font-bold '>
                                     <span className='w-8'>1 </span>
-                                    <span>Shipping address</span>
+                                    <span>{t('Checkout.Shipping address')}</span>
                                 </div>
                                 <div className='col-span-5 '>
                                     <p>
@@ -263,7 +264,7 @@ const CheckoutForm = () => {
                                             setIsDeliveryDateSelected(true)
                                         }}
                                     >
-                                        Change
+                                        {t('Checkout.Change')}
                                     </Button>
                                 </div>
                             </div>
@@ -271,7 +272,7 @@ const CheckoutForm = () => {
                             <>
                                 <div className='flex text-primary text-lg font-bold my-2'>
                                     <span className='w-8'>1 </span>
-                                    <span>Enter shipping address</span>
+                                    <span> {t('Checkout.Enter shipping address')}</span>
                                 </div>
                                 <Form {...shippingAddressForm}>
                                     <form
@@ -284,7 +285,7 @@ const CheckoutForm = () => {
                                         <Card className='md:ml-8 my-4'>
                                             <CardContent className='p-4 space-y-2'>
                                                 <div className='text-lg font-bold mb-2'>
-                                                    Your address
+                                                     {t('Checkout.Your address')}
                                                 </div>
 
                                                 <div className='flex flex-col gap-5 md:flex-row'>
@@ -293,7 +294,7 @@ const CheckoutForm = () => {
                                                         name='fullName'
                                                         render={({ field }) => (
                                                             <FormItem className='w-full'>
-                                                                <FormLabel>Full Name</FormLabel>
+                                                                <FormLabel>{t('Checkout.Full Name')}</FormLabel>
                                                                 <FormControl>
                                                                     <Input
                                                                         placeholder='Enter full name'
@@ -311,7 +312,7 @@ const CheckoutForm = () => {
                                                         name='street'
                                                         render={({ field }) => (
                                                             <FormItem className='w-full'>
-                                                                <FormLabel>Address</FormLabel>
+                                                                <FormLabel>{t('Checkout.Address')}</FormLabel>
                                                                 <FormControl>
                                                                     <Input
                                                                         placeholder='Enter address'
@@ -329,7 +330,7 @@ const CheckoutForm = () => {
                                                         name='city'
                                                         render={({ field }) => (
                                                             <FormItem className='w-full'>
-                                                                <FormLabel>City</FormLabel>
+                                                                <FormLabel>{t('Checkout.City')}</FormLabel>
                                                                 <FormControl>
                                                                     <Input placeholder='Enter city' {...field} />
                                                                 </FormControl>
@@ -342,7 +343,7 @@ const CheckoutForm = () => {
                                                         name='province'
                                                         render={({ field }) => (
                                                             <FormItem className='w-full'>
-                                                                <FormLabel>Province</FormLabel>
+                                                                <FormLabel>{t('Checkout.Province')}</FormLabel>
                                                                 <FormControl>
                                                                     <Input
                                                                         placeholder='Enter province'
@@ -358,7 +359,7 @@ const CheckoutForm = () => {
                                                         name='country'
                                                         render={({ field }) => (
                                                             <FormItem className='w-full'>
-                                                                <FormLabel>Country</FormLabel>
+                                                                <FormLabel>{t('Checkout.Country')}</FormLabel>
                                                                 <FormControl>
                                                                     <Input
                                                                         placeholder='Enter country'
@@ -376,7 +377,7 @@ const CheckoutForm = () => {
                                                         name='postalCode'
                                                         render={({ field }) => (
                                                             <FormItem className='w-full'>
-                                                                <FormLabel>Postal Code</FormLabel>
+                                                                <FormLabel>{t('Checkout.Postal Code')}</FormLabel>
                                                                 <FormControl>
                                                                     <Input
                                                                         placeholder='Enter postal code'
@@ -392,7 +393,7 @@ const CheckoutForm = () => {
                                                         name='phone'
                                                         render={({ field }) => (
                                                             <FormItem className='w-full'>
-                                                                <FormLabel>Phone number</FormLabel>
+                                                                <FormLabel>{t('Checkout.Phone number')}</FormLabel>
                                                                 <FormControl>
                                                                     <Input
                                                                         placeholder='Enter phone number'
@@ -410,7 +411,7 @@ const CheckoutForm = () => {
                                                     type='submit'
                                                     className='rounded-full font-bold'
                                                 >
-                                                    Ship to this address
+                                                    {t('Checkout.Ship to this address')}
                                                 </Button>
                                             </CardFooter>
                                         </Card>
@@ -425,7 +426,7 @@ const CheckoutForm = () => {
                             <div className='grid  grid-cols-1 md:grid-cols-12  my-3 pb-3'>
                                 <div className='flex text-lg font-bold  col-span-5'>
                                     <span className='w-8'>2 </span>
-                                    <span>Payment Method</span>
+                                    <span>{t('Checkout.Payment Method')}</span>
                                 </div>
                                 <div className='col-span-5 '>
                                     <p>{paymentMethod}</p>
@@ -438,7 +439,7 @@ const CheckoutForm = () => {
                                             if (paymentMethod) setIsDeliveryDateSelected(true)
                                         }}
                                     >
-                                        Change
+                                        {t('Checkout.Change')}
                                     </Button>
                                 </div>
                             </div>
@@ -446,7 +447,7 @@ const CheckoutForm = () => {
                             <>
                                 <div className='flex text-primary text-lg font-bold my-2'>
                                     <span className='w-8'>2 </span>
-                                    <span>Choose a payment method</span>
+                                    <span>{t('Checkout.Choose a payment method')}</span>
                                 </div>
                                 <Card className='md:ml-8 my-4'>
                                     <CardContent className='p-4'>
@@ -475,7 +476,7 @@ const CheckoutForm = () => {
                                             onClick={handleSelectPaymentMethod}
                                             className='rounded-full font-bold'
                                         >
-                                            Use this payment method
+                                             {t('Checkout.Use this payment method')}
                                         </Button>
                                     </CardFooter>
                                 </Card>
@@ -483,7 +484,7 @@ const CheckoutForm = () => {
                         ) : (
                             <div className='flex text-muted-foreground text-lg font-bold my-4 py-3'>
                                 <span className='w-8'>2 </span>
-                                <span>Choose a payment method</span>
+                                <span> {t('Checkout.Choose a payment method')}</span>
                             </div>
                         )}
                     </div>
@@ -493,11 +494,11 @@ const CheckoutForm = () => {
                             <div className='grid  grid-cols-1 md:grid-cols-12  my-3 pb-3'>
                                 <div className='flex text-lg font-bold  col-span-5'>
                                     <span className='w-8'>3 </span>
-                                    <span>Items and shipping</span>
+                                    <span>{t('Checkout.Items and shipping')}</span>
                                 </div>
                                 <div className='col-span-5'>
                                     <p>
-                                        Delivery date:{' '}
+                                        {t('Checkout.Delivery date:')}{' '}
                                         {
                                             formatDateTime(
                                                 calculateFutureDate(
@@ -523,7 +524,7 @@ const CheckoutForm = () => {
                                             setIsDeliveryDateSelected(false)
                                         }}
                                     >
-                                        Change
+                                        {t('Checkout.Change')}
                                     </Button>
                                 </div>
                             </div>
@@ -531,13 +532,13 @@ const CheckoutForm = () => {
                             <>
                                 <div className='flex text-primary  text-lg font-bold my-2'>
                                     <span className='w-8'>3 </span>
-                                    <span>Review items and shipping</span>
+                                    <span>{t('Checkout.Review items and shipping')}</span>
                                 </div>
                                 <Card className='md:ml-8'>
                                     <CardContent className='p-4'>
                                         <p className='mb-2'>
                                             <span className='text-lg font-bold text-green-700'>
-                                                Arriving{' '}
+                                                {t('Checkout.Arriving')}{' '}
                                                 {
                                                     formatDateTime(
                                                         calculateFutureDate(
@@ -547,8 +548,8 @@ const CheckoutForm = () => {
                                                     ).dateOnly
                                                 }
                                             </span>{' '}
-                                            If you order in the next {timeUntilMidnight().hours} hours
-                                            and {timeUntilMidnight().minutes} minutes.
+                                             {t('Checkout.If you order in the next')} {timeUntilMidnight().hours} {t('Checkout.hours')}
+                                            {t('Checkout.and')} {timeUntilMidnight().minutes} {t('Checkout.minutes')}
                                         </p>
                                         <div className='grid md:grid-cols-2 gap-6'>
                                             <div>
@@ -595,7 +596,7 @@ const CheckoutForm = () => {
                                                                         </SelectItem>
                                                                     ))}
                                                                     <SelectItem key='delete' value='0'>
-                                                                        Delete
+                                                                        {t('Checkout.Delete')}
                                                                     </SelectItem>
                                                                 </SelectContent>
                                                             </Select>
@@ -605,7 +606,7 @@ const CheckoutForm = () => {
                                             </div>
                                             <div>
                                                 <div className=' font-bold'>
-                                                    <p className='mb-2'> Choose a shipping speed:</p>
+                                                    <p className='mb-2'>  {t('Checkout.Choose a shipping speed:')}</p>
 
                                                     <ul>
                                                         <RadioGroup
@@ -664,7 +665,7 @@ const CheckoutForm = () => {
                         ) : (
                             <div className='flex text-muted-foreground text-lg font-bold my-4 py-3'>
                                 <span className='w-8'>3 </span>
-                                <span>Items and shipping</span>
+                                <span> {t('Checkout.Items and shipping')}</span>
                             </div>
                         )}
                     </div>
@@ -677,22 +678,22 @@ const CheckoutForm = () => {
                             <Card className='hidden md:block '>
                                 <CardContent className='p-4 flex flex-col md:flex-row justify-between items-center gap-3'>
                                     <Button onClick={handlePlaceOrder} className='rounded-full'>
-                                        Place Your Order
+                                         {t('Checkout.Place Your Order')}
                                     </Button>
                                     <div className='flex-1'>
                                         <p className='font-bold text-lg'>
-                                            Order Total: <ProductPrice price={totalPrice} plain />
+                                            {t('Checkout.Order Total:')} <ProductPrice price={totalPrice} plain />
                                         </p>
                                         <p className='text-xs'>
                                             {' '}
-                                            By placing your order, you agree to {
+                                            {t('Checkout.By placing your order, you agree to')} {
                                                 site.name
                                             }&apos;s{' '}
-                                            <Link href='/page/privacy-policy'>privacy notice</Link>{' '}
-                                            and
+                                            <Link href='/page/privacy-policy'>{t('Checkout.privacy notice')}</Link>{' '}
+                                            {t('Checkout.and')}
                                             <Link href='/page/conditions-of-use'>
                                                 {' '}
-                                                conditions of use
+                                                {t('Checkout.conditions of use')}
                                             </Link>
                                             .
                                         </p>

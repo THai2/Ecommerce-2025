@@ -32,6 +32,8 @@ import { IProductInput } from '@/types'
 import { toast } from 'sonner'
 import { ImageUploader, ImagePreview } from '@/components/shared/image-uploader'
 import { getProductVariants, upsertProductVariant } from '@/lib/actions/product-variant.action'
+import { useTranslations } from 'next-intl'
+
 
 const productDefaultValues: IProductInput =
   process.env.NODE_ENV === 'development'
@@ -75,6 +77,7 @@ const productDefaultValues: IProductInput =
         ratingDistribution: [],
         reviews: [],
       }
+      
 
 // Optimized component for managing arrays (tags, colors, sizes)
 const ArrayFieldManager = ({
@@ -94,6 +97,7 @@ const ArrayFieldManager = ({
 }) => {
   const [inputValue, setInputValue] = useState('')
   const [showSuggestions, setShowSuggestions] = useState(false)
+  
 
   const filteredSuggestions = suggestions.filter(
     suggestion => 
@@ -245,6 +249,8 @@ const ProductVariantManager = ({
   const [variantImages, setVariantImages] = useState<string[]>([])
   const [sizeStocks, setSizeStocks] = useState<{ size: string; stock: number }[]>([])
   const [loading, setLoading] = useState(false)
+  
+  const t = useTranslations()
 
   // Load variants when component mounts
   useEffect(() => {
@@ -328,11 +334,12 @@ const ProductVariantManager = ({
     )
   }
 
+
   return (
     <div className="space-y-6">
       {/* Color Selection */}
       <div>
-        <label className="text-sm font-medium">Select Color to Manage</label>
+        <label className="text-sm font-medium">{t('Admin-Products.Select Color to Manage')}</label>
         <div className="flex flex-wrap gap-2 mt-2">
           {colors.map((color) => (
             <Button
@@ -350,11 +357,11 @@ const ProductVariantManager = ({
 
       {selectedColor && (
         <div className="space-y-4">
-          <h3 className="text-lg font-medium">Managing: {selectedColor}</h3>
+          <h3 className="text-lg font-medium">{t('Admin-Products.Managing:')} {selectedColor}</h3>
           
           {/* Variant Images */}
           <div>
-            <label className="text-sm font-medium">Images for {selectedColor}</label>
+            <label className="text-sm font-medium">{t('Admin-Products.Images for')} {selectedColor}</label>
             <Card>
               <CardContent className="space-y-4 mt-4 min-h-48">
                 <div className="flex flex-wrap gap-3">
@@ -376,7 +383,7 @@ const ProductVariantManager = ({
 
           {/* Size Stock Management */}
           <div>
-            <label className="text-sm font-medium">Stock by Size</label>
+            <label className="text-sm font-medium">{t('Admin-Products.Stock by Size')} </label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
               {sizeStocks.map((item) => (
                 <div key={item.size} className="space-y-2">
@@ -406,14 +413,14 @@ const ProductVariantManager = ({
       {/* Variants Summary */}
       {variants.length > 0 && (
         <div>
-          <h3 className="text-lg font-medium mb-4">Existing Variants</h3>
+          <h3 className="text-lg font-medium mb-4">{t('Admin-Products.Existing Variants')} </h3>
           <div className="space-y-2">
             {variants.map((variant) => (
               <div key={variant._id} className="flex items-center justify-between p-3 border rounded">
                 <div>
                   <span className="font-medium">{variant.color}</span>
                   <span className="text-sm text-gray-500 ml-2">
-                    {variant.images.length} images, {variant.sizeStock.reduce((sum, s) => sum + s.stock, 0)} total stock
+                    {variant.images.length} {t('Admin-Products.images,')}  {variant.sizeStock.reduce((sum, s) => sum + s.stock, 0)} {t('Admin-Products.total stock')} 
                   </span>
                 </div>
                 <Button
@@ -530,13 +537,15 @@ const ProductForm = ({
     form.setValue('sizes', sizes.filter(size => size !== sizeToRemove))
   }
 
+  const t = useTranslations()
+
   return (
     <div className="space-y-6">
       {type === 'Update' ? (
         <Tabs defaultValue="basic" className="w-full">
           <TabsList>
-            <TabsTrigger value="basic">Basic Information</TabsTrigger>
-            <TabsTrigger value="variants">Variants & Stock</TabsTrigger>
+            <TabsTrigger value="basic">{t('Admin-Products.Basic Information')} </TabsTrigger>
+            <TabsTrigger value="variants">{t('Admin-Products.Variants & Stock')}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="basic">
