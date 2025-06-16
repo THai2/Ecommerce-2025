@@ -26,9 +26,9 @@ export default async function ProfilePage() {
           <span>›</span>
           <Link href='/account/manage'>{t('Account.Login & Security')}</Link>
           <span>›</span>
-          <span>{PAGE_TITLE}</span>
+          <span>{t('Account.Change Your Name')}</span>
         </div>
-        <h1 className='h1-bold py-4'>{PAGE_TITLE}</h1>
+        <h1 className='h1-bold py-4'>{t('Account.Change Your Name')}</h1>
         <Card className='max-w-2xl'>
           <CardContent className='p-4 flex justify-between flex-wrap'>
             <p className='text-sm py-2'>

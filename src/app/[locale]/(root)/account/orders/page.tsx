@@ -15,6 +15,7 @@ import { IOrder } from '@/models/order'
 import { formatDateTime, formatId } from '@/lib/utils'
 import BrowsingHistoryList from '@/components/shared/browsing-history-list'
 import ProductPrice from '@/components/shared/product/product-price'
+import { getTranslations } from 'next-intl/server'
 
 const PAGE_TITLE = 'Your Orders'
 export const metadata: Metadata = {
@@ -24,6 +25,7 @@ export default async function OrdersPage(props: {
   searchParams: Promise<{ page: string }>
 }) {
   const searchParams = await props.searchParams
+  const t = await getTranslations()
   const page = Number(searchParams.page) || 1
   const orders = await getMyOrders({
     page,
@@ -31,28 +33,28 @@ export default async function OrdersPage(props: {
   return (
     <div>
       <div className='flex gap-2'>
-        <Link href='/account'>Your Account</Link>
+        <Link href='/account'>{t('Account.Your Account')}</Link>
         <span>›</span>
-        <span>{PAGE_TITLE}</span>
+        <span>{t('Account.Your Orders')}</span>
       </div>
-      <h1 className='h1-bold pt-4'>{PAGE_TITLE}</h1>
+      <h1 className='h1-bold pt-4'>{t('Account.Your Orders')}</h1>
       <div className='overflow-x-auto'>
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Id</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Total</TableHead>
-              <TableHead>Paid</TableHead>
-              <TableHead>Delivered</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead>{t('Account.Date')}</TableHead>
+              <TableHead>{t('Account.Total')}</TableHead>
+              <TableHead>{t('Account.Paid')}</TableHead>
+              <TableHead>{t('Account.Delivered')}</TableHead>
+              <TableHead>{t('Account.Actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {orders.data.length === 0 && (
               <TableRow>
                 <TableCell colSpan={6} className=''>
-                  You have no orders.
+                  {t('Account.You have no orders')}
                 </TableCell>
               </TableRow>
             )}
@@ -81,7 +83,7 @@ export default async function OrdersPage(props: {
                 </TableCell>
                 <TableCell>
                   <Link href={`/account/orders/${order._id}`}>
-                    <span className='px-2'>Details</span>
+                    <span className='px-2'>{t('Account.Details')}</span>
                   </Link>
                 </TableCell>
               </TableRow>

@@ -19,10 +19,12 @@ import { Input } from '@/components/ui/input'
 import { updateUserName } from '@/lib/actions/user.actions'
 import { UserNameSchema } from '@/lib/validator'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 export const ProfileForm = () => {
   const router = useRouter()
   const { data: session, update } = useSession()
+  const t = useTranslations()
   const form = useForm<z.infer<typeof UserNameSchema>>({
     resolver: zodResolver(UserNameSchema),
     defaultValues: {
@@ -59,7 +61,7 @@ export const ProfileForm = () => {
             name='name'
             render={({ field }) => (
               <FormItem className='w-full'>
-                <FormLabel className='font-bold'>New name</FormLabel>
+                <FormLabel className='font-bold'>{t('Account.New name')}</FormLabel>
                 <FormControl>
                   <Input
                     placeholder='Name'
@@ -79,7 +81,7 @@ export const ProfileForm = () => {
           disabled={form.formState.isSubmitting}
           className='button col-span-2 w-full'
         >
-          {form.formState.isSubmitting ? 'Submitting...' : 'Save Changes'}
+          {form.formState.isSubmitting ? t('Account.Submitting') : t('Account.Save Changes')}
         </Button>
       </form>
     </Form>

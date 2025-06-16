@@ -6,6 +6,7 @@ import OrderDetailsForm from '@/components/shared/order/order-details-form'
 import Link from 'next/link'
 import { formatId } from '@/lib/utils'
 import { auth } from '../../../../../../../auth'
+import { getTranslations } from 'next-intl/server'
 
 export async function generateMetadata(props: {
   params: Promise<{ id: string }>
@@ -30,17 +31,18 @@ export default async function OrderDetailsPage(props: {
   if (!order) notFound()
 
   const session = await auth()
+  const t = await getTranslations()
 
   return (
     <>
       <div className='flex gap-2'>
-        <Link href='/account'>Your Account</Link>
+        <Link href='/account'>{t('Account.Your Account')}</Link>
         <span>›</span>
-        <Link href='/account/orders'>Your Orders</Link>
+        <Link href='/account/orders'>{t('Account.Your Orders')}</Link>
         <span>›</span>
-        <span>Order {formatId(order._id)}</span>
+        <span>{t('Account.Order')} {formatId(order._id)}</span>
       </div>
-      <h1 className='h1-bold py-4'>Order {formatId(order._id)}</h1>
+      <h1 className='h1-bold py-4'> {t('Account.Order')}{formatId(order._id)}</h1>
       <OrderDetailsForm
         order={order}
         isAdmin={session?.user?.role === 'Admin' || false}

@@ -79,24 +79,24 @@ export default function CartAddItem({ itemId }: { itemId: string }) {
                   <div className='flex items-center'>
                     <div>
                       <span className='text-green-700'>
-                        Your order qualifies for FREE Shipping.
+                      {t('Cart.Your order qualifies for FREE Shipping')}
                       </span>{' '}
-                      Choose this option at checkout.
+                      {t('Cart.Choose this option at checkout')}
                     </div>
                   </div>
                 )}
               </div>
               <div className='lg:border-l lg:border-muted lg:pl-3 flex flex-col items-center gap-3  '>
                 <div className='flex gap-3'>
-                  <span className='text-lg font-bold'>Cart Subtotal:</span>
+                  <span className='text-lg font-bold'>{t('Cart.Subtotal')}</span>
                   <ProductPrice className='text-2xl' price={itemsPrice} />
                 </div>
                 <Link
                   href='/checkout'
                   className={cn(buttonVariants(), 'rounded-full w-full')}
                 >
-                  Proceed to checkout (
-                  {items.reduce((a, c) => a + c.quantity, 0)} items)
+                  {t('Cart.Proceed to Checkout')} (
+                  {items.reduce((a, c) => a + c.quantity, 0)} {t('Cart.items')})
                 </Link>
                 <Link
                   href='/cart'

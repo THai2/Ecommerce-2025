@@ -187,7 +187,7 @@ const CheckoutForm = () => {
                         </Button>
                         <p className='text-xs text-center py-2'>
                              {t('Checkout.By placing your order, you agree to')}{site.name}&apos;s{' '}
-                            <Link href='/page/privacy-policy'>{t('Checkout.privacy notice')}</Link> {t('Checkout.and')}
+                            <Link href='/page/privacy-policy'> {t('Checkout.privacy notice')}</Link> {t('Checkout.and')}
                             <Link href='/page/conditions-of-use'> {t('Checkout.conditions of use')}</Link>.
                         </p>
                     </div>
@@ -548,8 +548,8 @@ const CheckoutForm = () => {
                                                     ).dateOnly
                                                 }
                                             </span>{' '}
-                                             {t('Checkout.If you order in the next')} {timeUntilMidnight().hours} {t('Checkout.hours')}
-                                            {t('Checkout.and')} {timeUntilMidnight().minutes} {t('Checkout.minutes')}
+                                             {t('Checkout.If you order in the next')} {timeUntilMidnight().hours} {t('Checkout.hours')} 
+                                             {t('Checkout.and')} {timeUntilMidnight().minutes} {t('Checkout.minutes')}
                                         </p>
                                         <div className='grid md:grid-cols-2 gap-6'>
                                             <div>

@@ -301,7 +301,28 @@
     "Logout": "Logout",
     "If you want to change the name associated with your": "If you want to change the name associated with your",
     "account, you may do so below, Be sure to click the Save Changes button when you are done": "account, you may do so below, Be sure to click the Save Changes button when you are done",
-    "Change Your Name": "Change Your Name"
+    "Change Your Name": "Change Your Name",
+    "New name": "New name",
+    "Submitting": "Submitting...",
+    "Save Changes": "Save Changes",
+    "Name": "Name",
+    "Edit":"Edit",
+    "will be implemented in the next version": "will be implemented in the next version",
+    "Password": "Password",
+    "Your Orders": "Your Orders",
+    "Order": "Order",
+    "Date": "Date",
+    "Total": "Total",
+    "Paid": "Paid",
+    "Delivered": "Delivered",
+    "Actions": "Actions",
+    "You have no orders": "You have no orders.",
+    "Details": "Details",
+    "Track, return, cancel an order, download invoice or buy again": "Track, return, cancel an order, download invoice or buy again",
+    "Manage password, email and mobile number": "Manage password, email and mobile number",
+    "Orders": "Orders",
+    "Addresses": "Addresses",
+    "Edit, remove or set default address": "Edit, remove or set default address"
   },
   "Admin-Products": {
     "Add Product": "Add Product",
@@ -340,8 +361,6 @@
     "Error updating product": "Error updating product",
     "Error deleting product": "Error deleting product",
     "Name": "Name",
-    "Price": "Price",
-    "Category": "Category",
     "Stock": "Stock",
     "Rating": "Rating",
     "Published": "Published",
@@ -367,7 +386,6 @@
     "Net Price": "Net Price",
     "Count In Stock": "Count In Stock",
     "Images": "Images",
-    "Description":"Description",
     "Publish Product": "Publish Product",
     "Make this product visible to customers": "Make this product visible to customers",
     "total stock": "total stock"
@@ -408,10 +426,11 @@
     "If you order in the next": "If you order in the next",
     "hours": "hours",
     "minutes": "minutes",
-    "and": "and",
     "Delete":"Delete",
     "Choose a shipping speed:": "Choose a shipping speed:",
     "Your address": "Your address",
-    "Choose a payment method": "Choose a payment method"
+    "Choose a payment method": "Choose a payment method",
+    "Shipping Address": "Shipping Address",
+    "View Order": "View Order"
   }
 }

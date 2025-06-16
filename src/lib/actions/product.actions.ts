@@ -12,6 +12,7 @@ import { IProductInput } from '@/types'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { ProductInputSchema, ProductUpdateSchema } from '../validator'
+import Category from '@/models/category'
 
 // CREATE
 export async function createProduct(data: IProductInput) {
@@ -330,3 +331,78 @@ export async function getAllTags() {
   )
 }
 
+// Lấy sản phẩm theo danh mục (sử dụng name hoặc slug)
+export async function getProductsByCategory(categoryIdentifier: string, page: number = 1, limit: number = 12) {
+  try {
+    await connectToDatabase()
+    
+    // Tìm category theo slug hoặc name
+    const category = await Category.findOne({ 
+      $or: [
+        { slug: categoryIdentifier },
+        { name: categoryIdentifier }
+      ],
+      isActive: true 
+    })
+    
+    if (!category) {
+      return { success: false, error: 'Category not found' }
+    }
+    
+    const skip = (page - 1) * limit
+    
+    const products = await Product.find({ 
+      category: category.name, // Sử dụng name để liên kết với Product
+      isPublished: true 
+    })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    
+    const total = await Product.countDocuments({ 
+      category: category.name, 
+      isPublished: true 
+    })
+    
+    return {
+      success: true,
+      products: JSON.parse(JSON.stringify(products)),
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+      category: JSON.parse(JSON.stringify(category))
+    }
+  } catch (error: any) {
+    return { success: false, error: error.message }
+  }
+}
+
+// Lấy số lượng sản phẩm theo từng danh mục
+export async function getCategoriesWithProductCount() {
+  try {
+    await connectToDatabase()
+    
+    const categories = await Category.find({ isActive: true }).sort({ name: 1 })
+    
+    const categoriesWithCount = await Promise.all(
+      categories.map(async (category) => {
+        const productCount = await Product.countDocuments({ 
+          category: category.name, // Sử dụng name để liên kết với Product
+          isPublished: true 
+        })
+        
+        return {
+          ...JSON.parse(JSON.stringify(category)),
+          productCount
+        }
+      })
+    )
+    
+    return { success: true, categories: categoriesWithCount }
+  } catch (error: any) {
+    return { success: false, error: error.message }
+  }
+}

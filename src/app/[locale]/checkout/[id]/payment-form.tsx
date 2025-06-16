@@ -18,6 +18,7 @@ import { redirect, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import ProductPrice from '@/components/shared/product/product-price'
 import { IOrder } from '@/models/order'
+import { useTranslations } from 'next-intl'
 
 export default function OrderPaymentForm({
   order,
@@ -71,22 +72,23 @@ export default function OrderPaymentForm({
       toast.error(res.message)
     }
   }
+  const t = useTranslations()
 
   const CheckoutSummary = () => (
     <Card>
       <CardContent className='p-4'>
         <div>
-          <div className='text-lg font-bold'>Order Summary</div>
+          <div className='text-lg font-bold'>{t('Checkout.Order Summary')}</div>
           <div className='space-y-2'>
             <div className='flex justify-between'>
-              <span>Items:</span>
+              <span>{t('Checkout.Items:')}</span>
               <span>
                 {' '}
                 <ProductPrice price={itemsPrice} plain />
               </span>
             </div>
             <div className='flex justify-between'>
-              <span>Shipping & Handling:</span>
+              <span>{t('Checkout.Shipping & Handling:')}</span>
               <span>
                 {shippingPrice === undefined ? (
                   '--'
@@ -98,7 +100,7 @@ export default function OrderPaymentForm({
               </span>
             </div>
             <div className='flex justify-between'>
-              <span> Tax:</span>
+              <span> {t('Checkout.Tax:')}</span>
               <span>
                 {taxPrice === undefined ? (
                   '--'
@@ -108,7 +110,7 @@ export default function OrderPaymentForm({
               </span>
             </div>
             <div className='flex justify-between  pt-1 font-bold text-lg'>
-              <span> Order Total:</span>
+              <span> {t('Checkout.Order Total:')}</span>
               <span>
                 {' '}
                 <ProductPrice price={totalPrice} plain />
@@ -132,7 +134,7 @@ export default function OrderPaymentForm({
                 className='w-full rounded-full'
                 onClick={() => router.push(`/account/orders/${order._id}`)}
               >
-                View Order
+                {t('Checkout.View Order')}
               </Button>
             )}
           </div>
@@ -149,7 +151,7 @@ export default function OrderPaymentForm({
           <div>
             <div className='grid md:grid-cols-3 my-3 pb-3'>
               <div className='text-lg font-bold'>
-                <span>Shipping Address</span>
+                <span>{t('Checkout.Shipping Address')}</span>
               </div>
               <div className='col-span-2'>
                 <p>
@@ -165,7 +167,7 @@ export default function OrderPaymentForm({
           <div className='border-y'>
             <div className='grid md:grid-cols-3 my-3 pb-3'>
               <div className='text-lg font-bold'>
-                <span>Payment Method</span>
+                <span>{t('Checkout.Payment Method')}</span>
               </div>
               <div className='col-span-2'>
                 <p>{paymentMethod}</p>
@@ -175,11 +177,11 @@ export default function OrderPaymentForm({
 
           <div className='grid md:grid-cols-3 my-3 pb-3'>
             <div className='flex text-lg font-bold'>
-              <span>Items and shipping</span>
+              <span>{t('Checkout.Items and shipping')}</span>
             </div>
             <div className='col-span-2'>
               <p>
-                Delivery date:
+                {t('Checkout.Delivery date:')}
                 {formatDateTime(expectedDeliveryDate).dateOnly}
               </p>
               <ul>
