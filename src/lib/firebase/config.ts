@@ -1,5 +1,6 @@
 // lib/firebase/config.ts
 import { initializeApp } from 'firebase/app';
+import { getAuth, createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth';
 import { deleteObject, getDownloadURL, getStorage, listAll, ref, uploadBytesResumable } from 'firebase/storage';
 
 // Cấu hình Firebase (thay bằng thông tin của bạn)
@@ -17,7 +18,19 @@ const app = initializeApp(firebaseConfig);
 
 // Khởi tạo Firebase Storage
 const storage = getStorage(app);
-
+export const auth = getAuth(app);
+export async function firebaseSignUp(email: string, password: string, name: string) {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+    await updateProfile(userCredential.user, { displayName: name })
+    if (auth.currentUser) {
+      await sendEmailVerification(auth.currentUser)
+    }
+    return { success: true, user: userCredential.user }
+  } catch (error) {
+    return { success: false, error }
+  }
+}
 // Helper function to generate a unique file name
 const generateUniqueFileName = (file: File): string => {
   const timestamp = Date.now();

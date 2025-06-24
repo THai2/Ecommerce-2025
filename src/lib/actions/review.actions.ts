@@ -145,3 +145,28 @@ export const getReviewByProductId = async ({
   })
   return review ? (JSON.parse(JSON.stringify(review)) as IReview) : null
 }
+
+export async function getReviewsByUserId(userId: string) {
+  try {
+    await connectToDatabase()
+    const reviews = await Review.find({ user: userId })
+      .populate('product', 'name')
+      .sort({ createdAt: -1 })
+    return JSON.parse(JSON.stringify(reviews)) as IReview[]
+  } catch (error) {
+    console.error('Error fetching user reviews:', error)
+    return []
+  }
+}
+
+export async function deleteReview(reviewId: string) {
+  try {
+    await connectToDatabase()
+    const deleted = await Review.findByIdAndDelete(reviewId)
+    if (!deleted) throw new Error('Review not found')
+    await updateProductReview(deleted.product.toString())
+    return { success: true, message: 'Review deleted successfully' }
+  } catch (error) {
+    return { success: false, message: formatError(error) }
+  }
+}

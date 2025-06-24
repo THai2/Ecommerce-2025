@@ -22,21 +22,22 @@ import { UserSignUpSchema } from '@/lib/validator'
 import { Separator } from '@/components/ui/separator'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
 import { useTranslations } from 'next-intl'
+import { firebaseSignUp } from '@/lib/firebase/config'
 
 const signUpDefaultValues =
   process.env.NODE_ENV === 'development'
     ? {
-        name: 'john doe',
-        email: 'john@me.com',
-        password: '123456',
-        confirmPassword: '123456',
-      }
+      name: 'john doe',
+      email: 'john@me.com',
+      password: '123456',
+      confirmPassword: '123456',
+    }
     : {
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-      }
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    }
 
 export default function CredentialsSignInForm() {
   const {
@@ -55,6 +56,15 @@ export default function CredentialsSignInForm() {
 
   const onSubmit = async (data: IUserSignUp) => {
     try {
+      const firebaseResult = await firebaseSignUp(data.email, data.password, data.name)
+      if (!firebaseResult.success) {
+        toast.error(
+          typeof firebaseResult.error === 'string'
+            ? firebaseResult.error
+            : t('Sign-up.Email account already in use')
+        )
+        return
+      }
       const res = await registerUser(data)
       if (!res.success) {
         toast.error(res.message)

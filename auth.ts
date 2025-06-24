@@ -1,5 +1,6 @@
 import { MongoDBAdapter } from '@auth/mongodb-adapter'
 import bcrypt from 'bcryptjs'
+import Google from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { connectToDatabase } from '@/lib/db'
 import client from '@/lib/db/client'
@@ -30,6 +31,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   adapter: MongoDBAdapter(client),
   providers: [
+    Google({
+      allowDangerousEmailAccountLinking: true,
+    }),
     CredentialsProvider({
       credentials: {
         email: {

@@ -29,8 +29,10 @@ import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react'
 import { ICategory } from '@/models/category'
 import { toast } from 'sonner'
 import { deleteCategory, getCategories } from '@/lib/actions/category.action'
+import { useTranslations } from 'next-intl'
 
 export default function CategoriesPage() {
+  const t = useTranslations('Admin.Categories')
   const [categories, setCategories] = useState<ICategory[]>([])
   const [filteredCategories, setFilteredCategories] = useState<ICategory[]>([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -54,10 +56,10 @@ export default function CategoriesPage() {
       if (result.success) {
         setCategories(result.categories)
       } else {
-        toast.error('Failed to fetch categories')
+        toast.error(t('FetchError'))
       }
     } catch (error) {
-      toast.error('Error loading categories')
+      toast.error(t('FetchError'))
     } finally {
       setLoading(false)
     }
@@ -67,20 +69,20 @@ export default function CategoriesPage() {
     try {
       const result = await deleteCategory(id)
       if (result.success) {
-        toast.success('Category deleted successfully')
+        toast.success(t('DeleteSuccess'))
         fetchCategories()
       } else {
-        toast.error(result.error || 'Failed to delete category')
+        toast.error(result.error || t('DeleteError'))
       }
     } catch (error) {
-      toast.error('Error deleting category')
+      toast.error(t('DeleteError'))
     }
   }
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <p className="text-gray-500">{t('Loading')}</p>
       </div>
     )
   }
@@ -89,13 +91,13 @@ export default function CategoriesPage() {
     <div className="container mx-auto py-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold">Categories Management</h1>
-          <p className="text-gray-600 mt-1">Manage your product categories</p>
+          <h1 className="text-3xl font-bold">{t('Title')}</h1>
+          <p className="text-gray-600 mt-1">{t('Subtitle')}</p>
         </div>
         <Link href="/admin/categories/create">
           <Button className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
-            Add Category
+            {t('AddCategory')}
           </Button>
         </Link>
       </div>
@@ -106,14 +108,14 @@ export default function CategoriesPage() {
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
-                placeholder="Search categories..."
+                placeholder={t('SearchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
             <div className="text-sm text-gray-500">
-              Total: {filteredCategories.length} categories
+              {t('TotalCategories', { count: filteredCategories.length })}
             </div>
           </div>
         </div>
@@ -121,12 +123,12 @@ export default function CategoriesPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Slug</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{t('TableHeaders.Name')}</TableHead>
+              <TableHead>{t('TableHeaders.Slug')}</TableHead>
+              <TableHead>{t('TableHeaders.Description')}</TableHead>
+              <TableHead>{t('TableHeaders.Status')}</TableHead>
+              <TableHead>{t('TableHeaders.Created')}</TableHead>
+              <TableHead className="text-right">{t('TableHeaders.Actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -134,12 +136,12 @@ export default function CategoriesPage() {
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-8">
                   <div className="text-gray-500">
-                    {searchTerm ? 'No categories found matching your search.' : 'No categories found.'}
+                    {searchTerm ? t('NoResults') : t('NoCategories')}
                   </div>
                   {!searchTerm && (
                     <Link href="/admin/categories/create">
                       <Button variant="outline" className="mt-2">
-                        Create your first category
+                        {t('CreateFirstCategory')}
                       </Button>
                     </Link>
                   )}
@@ -152,12 +154,12 @@ export default function CategoriesPage() {
                   <TableCell className="font-mono text-sm">{category.slug}</TableCell>
                   <TableCell>
                     <div className="max-w-xs truncate">
-                      {category.description || 'No description'}
+                      {category.description || t('NoDescription')}
                     </div>
                   </TableCell>
                   <TableCell>
                     <Badge variant={category.isActive ? 'default' : 'secondary'}>
-                      {category.isActive ? 'Active' : 'Inactive'}
+                      {category.isActive ? t('Active') : t('Inactive')}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -166,36 +168,43 @@ export default function CategoriesPage() {
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
                       <Link href={`/admin/categories/${category._id}`}>
-                        <Button variant="ghost" size="sm">
+                        <Button variant="ghost" size="sm" title={t('View')}>
                           <Eye className="w-4 h-4" />
                         </Button>
                       </Link>
                       <Link href={`/admin/categories/${category._id}/edit`}>
-                        <Button variant="ghost" size="sm">
+                        <Button variant="ghost" size="sm" title={t('Edit')}>
                           <Edit className="w-4 h-4" />
                         </Button>
                       </Link>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-red-600 hover:text-red-700"
+                            title={t('Delete')}
+                          >
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Category</AlertDialogTitle>
+                            <AlertDialogTitle>{t('DeleteTitle')}</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Are you sure you want to delete &quot;{category.name}&quot;? 
-                              This action cannot be undone and will fail if there are products using this category.
+                              {t.rich('DeleteMessage', {
+                                name: category.name,
+                                strong: (chunks) => <strong>{chunks}</strong>
+                              })}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogCancel>{t('Cancel')}</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() => handleDelete(category._id, category.name)}
                               className="bg-red-600 hover:bg-red-700"
                             >
-                              Delete
+                              {t('Delete')}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

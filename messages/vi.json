@@ -120,7 +120,8 @@
     "items available": "sản phẩm có sẵn",
     "Out of stock in": "Hết hàng tại",
      "left": "còn lại",
-    "In stock": "Còn hàng"
+    "In stock": "Còn hàng",
+    "Only X left in stock - order soon": "Chỉ còn {count} sản phẩm - hãy mua ngay"
   },
   "Cart": {
     "Shopping Cart": "Giỏ hàng",
@@ -152,7 +153,7 @@
     "Results": "Kết quả",
     "No results found": "Không tìm thấy kết quả",
     "Search for": "Tìm kiếm",
-    "Department": "Phòng ban",
+    "Department": "Danh mục",
     "Price": "Giá",
     "Tag": "Thẻ",
     "Category": "Danh mục",
@@ -171,7 +172,15 @@
     "No product found": "Không tìm thấy sản phẩm",
     "Next": "Tiếp theo",
     "Previous": "Trước",
-    "Page": "Trang"
+    "Page": "Trang",
+    "PriceLowToHigh": "Giá: Thấp đến cao",
+    "PriceHighToLow": "Giá: Cao đến thấp",
+    "NewestArrivals": "Hàng mới về",
+    "AvgCustomerReview": "Đánh giá trung bình",
+    "BestSelling": "Bán chạy nhất",
+    "PriceRange1": "24.000đ đến 480.000đ",
+    "PriceRange2": "21$ đến 50$",
+    "PriceRange3": "51$ đến 1000$"
   },
   "Footer": {
     "Select a currency": "Chọn tiền tệ",
@@ -203,7 +212,7 @@
   "Admin": {
     "Deleted User": "Người dùng đã xóa",
     "Overview": "Tổng quan",
-    "Products": "Sản phẩm",
+    "Product": "Sản phẩm",
     "Orders": "Đơn hàng",
     "Users": "Người dùng",
     "Pages": "Trang",
@@ -231,7 +240,260 @@
     "Actions": "Hành động",
     "Details": "Chi tiết",
     "Brands & Tags": "Thương hiệu & Thẻ",
-    "Categories": "Danh mục"
+    "Category": "Danh mục",
+    "BrandProducts": {
+    "BackToBrands": "Quay lại Thương hiệu",
+    "BrandTitle": "Thương hiệu: {brand}",
+    "BrandDescription": "Tất cả sản phẩm từ thương hiệu này",
+    "NoProductsFound": "Không tìm thấy sản phẩm",
+    "NoProductsDescription": "Thương hiệu này chưa có sản phẩm nào được công bố.",
+    "ShowingProducts": "Hiển thị {start} - {end} trong tổng {total} sản phẩm",
+    "SortBy": "Sắp xếp theo:",
+    "SortPlaceholder": "Chọn cách sắp xếp",
+    "SortOptions": {
+      "latest": "Mới nhất",
+      "best-selling": "Bán chạy nhất",
+      "price-low-to-high": "Giá: Thấp đến Cao",
+      "price-high-to-low": "Giá: Cao đến Thấp",
+      "avg-customer-review": "Đánh giá cao nhất"
+    },
+    "PageInfo": "Trang {current} trên {total}",
+    "Previous": "Trước",
+    "Next": "Sau",
+    "Product": {
+      "InStock": "Còn hàng",
+      "OutOfStock": "Hết hàng",
+      "View": "Xem",
+      "Edit": "Sửa",
+      "Sold": "Đã bán",
+      "Reviews": "đánh giá",
+      "Rating": "Đánh giá"
+    }
+  },
+  "TagProducts": {
+    "BackToTags": "Quay lại Nhãn",
+    "TagTitle": "Nhãn: {tag}",
+    "TagDescription": "Tất cả sản phẩm có nhãn này",
+    "NoProductsFound": "Không tìm thấy sản phẩm",
+    "NoProductsDescription": "Chưa có sản phẩm nào được công bố với nhãn này.",
+    "ShowingProducts": "Hiển thị {start} - {end} trong tổng {total} sản phẩm",
+    "SortBy": "Sắp xếp theo:",
+    "SortPlaceholder": "Chọn cách sắp xếp",
+    "SortOptions": {
+      "latest": "Mới nhất",
+      "best-selling": "Bán chạy nhất",
+      "price-low-to-high": "Giá: Thấp đến Cao",
+      "price-high-to-low": "Giá: Cao đến Thấp",
+      "avg-customer-review": "Đánh giá cao nhất"
+    },
+    "PageInfo": "Trang {current} trên {total}",
+    "Previous": "Trước",
+    "Next": "Sau",
+    "Product": {
+      "InStock": "Còn hàng",
+      "OutOfStock": "Hết hàng",
+      "View": "Xem",
+      "Edit": "Sửa",
+      "Sold": "Đã bán",
+      "Reviews": "đánh giá"
+    }
+  },
+  "Categories": {
+      "Title": "Quản lý Danh mục",
+      "Subtitle": "Quản lý danh mục sản phẩm",
+      "Loading": "Đang tải danh mục...",
+      "AddCategory": "Thêm Danh mục",
+      "SearchPlaceholder": "Tìm kiếm danh mục...",
+      "TotalCategories": "Tổng: {count} danh mục",
+      "NoResults": "Không tìm thấy danh mục phù hợp.",
+      "NoCategories": "Không có danh mục nào.",
+      "CreateFirstCategory": "Tạo danh mục đầu tiên",
+      "NoDescription": "Không có mô tả",
+      "Inactive": "Không hoạt động",
+      "View": "Xem",
+      "Edit": "Sửa",
+      "Delete": "Xóa",
+      "DeleteTitle": "Xóa Danh mục",
+      "DeleteMessage": "Bạn có chắc muốn xóa <strong>{name}</strong>? Hành động này không thể hoàn tác và sẽ thất bại nếu có sản phẩm đang sử dụng danh mục này.",
+      "BackToCategories": "Quay lại Danh mục",
+      "CreateNewCategory": "Tạo Danh mục Mới",
+      "AddNewProductCategory": "Thêm danh mục sản phẩm mới",
+      "CategoryInformation": "Thông tin Danh mục",
+      "CategoryName": "Tên Danh mục",
+      "CategoryNameRequired": "Tên danh mục là bắt buộc",
+      "Slug": "Đường dẫn",
+      "SlugDescription": "Phiên bản thân thiện với URL của tên. Tự động tạo từ tên.",
+      "Description": "Mô tả",
+      "CategorySettings": "Cài đặt Danh mục",
+      "Active": "Hoạt động",
+      "Creating": "Đang tạo...",
+      "CreateCategory": "Tạo Danh mục",
+      "Cancel": "Hủy",
+      "EditCategory": "Chỉnh sửa danh mục",
+      "UpdateInfo": "Cập nhật thông tin danh mục",
+      "NameLabel": "Tên danh mục",
+      "NamePlaceholder": "Nhập tên danh mục",
+      "SlugLabel": "Đường dẫn",
+      "SlugPlaceholder": "duong-dan-danh-muc",
+      "DescriptionLabel": "Mô tả",
+      "DescriptionPlaceholder": "Nhập mô tả danh mục",
+      "SettingsTitle": "Cài đặt danh mục",
+      "ActiveLabel": "Kích hoạt",
+      "ActiveDescription": "Danh mục kích hoạt sẽ hiển thị với khách hàng",
+      "UpdateButton": "Cập nhật danh mục",
+      "CancelButton": "Hủy",
+      "Updating": "Đang cập nhật...",
+      "TableHeaders": {
+        "Name": "Tên",
+        "Slug": "Đường dẫn",
+        "Description": "Mô tả",
+        "Status": "Trạng thái",
+        "Created": "Ngày tạo",
+        "Actions": "Thao tác"
+      },
+      "Placeholders": {
+        "CategoryName": "Nhập tên danh mục",
+        "Slug": "duong-dan-danh-muc",
+        "Description": "Nhập mô tả danh mục"
+      },
+      "Messages": {
+        "FetchError": "Lỗi khi tải danh mục",
+        "DeleteSuccess": "Xóa danh mục thành công",
+        "DeleteError": "Lỗi khi xóa danh mục",
+        "CategoryNameRequired": "Tên danh mục là bắt buộc",
+        "CategoryCreated": "Tạo danh mục thành công",
+        "CategoryCreateFailed": "Lỗi khi tạo danh mục",
+        "ErrorCreatingCategory": "Lỗi khi tạo danh mục",
+        "FetchCategoryError": "Lỗi khi tải danh mục",
+        "FetchProductsError": "Lỗi khi tải sản phẩm",
+        "LoadError": "Lỗi khi tải danh mục",
+        "NameRequired": "Tên danh mục là bắt buộc",
+        "UpdateSuccess": "Cập nhật danh mục thành công",
+        "UpdateError": "Lỗi khi cập nhật danh mục"
+      },
+      "Detail": {
+        "Title": "Chi tiết Danh mục",
+        "CategoryNotFound": "Không tìm thấy danh mục",
+        "EditCategory": "Chỉnh sửa Danh mục",
+        "Name": "Tên",
+        "NoDescription": "Không có mô tả",
+        "ProductsInCategory": "Sản phẩm trong danh mục ({count})",
+        "ProductName": "Tên",
+        "Price": "Giá",
+        "Stock": "Kho",
+        "Published": "Xuất bản",
+        "LastUpdate": "Cập nhật cuối",
+        "Previous": "Trước",
+        "Next": "Sau",
+        "PageInfo": "Trang {current} trên {total}",
+        "StatusMetadata": "Trạng thái & Thông tin",
+        "Status": "Trạng thái",
+        "CategoryID": "ID Danh mục",
+        "Created": "Ngày tạo",
+        "LastUpdated": "Cập nhật cuối",
+        "Yes": "Có",
+        "No": "Không",
+        "Loading": "Đang tải..."
+      }
+    },
+  "Nav": {
+    "Overview": "Tổng quan",
+    "Products": "Sản phẩm",
+    "Categories": "Danh mục",
+    "BrandsTags": "Thương hiệu & Nhãn",
+    "Orders": "Đơn hàng",
+    "Users": "Người dùng",
+    "Carousel": "Quảng cáo xoay vòng",
+    "Pages": "Trang web",
+    "Settings": "Cài đặt"
+  },
+  "Products": {
+      "Name": "Tên sản phẩm",
+      "Slug": "Đường dẫn URL",
+      "Category": "Danh mục",
+      "Brand": "Thương hiệu",
+      "ListPrice": "Giá niêm yết",
+      "NetPrice": "Giá bán",
+      "CountInStock": "Số lượng tồn kho",
+      "Images": "Hình ảnh sản phẩm",
+      "Tags": "Nhãn",
+      "Colors": "Màu sắc",
+      "Sizes": "Kích cỡ",
+      "Description": "Mô tả",
+      "PublishProduct": "Xuất bản sản phẩm",
+      "PublishDescription": "Hiển thị sản phẩm này cho khách hàng",
+      "Product": "Sản phẩm",
+      "Generate": "Tạo tự động",
+      "Submitting": "Đang xử lý...",
+      "BasicInformation": "Thông tin cơ bản",
+      "VariantsAndStock": "Biến thể & Tồn kho",
+      "StockSummary": "Tổng quan tồn kho",
+      "TotalStock": "Tổng tồn kho",
+      "Variants": "Biến thể",
+      "SelectColorToManage": "Chọn màu để quản lý",
+      "Managing": "Đang quản lý màu {color}",
+      "ImagesFor": "Hình ảnh cho màu {color}",
+      "StockBySize": "Tồn kho theo kích cỡ",
+      "VariantTotal": "Tổng biến thể: {total}",
+      "Saving": "Đang lưu...",
+      "SaveVariant": "Lưu biến thể",
+      "ExistingVariants": "Biến thể hiện có",
+      "Edit": "Chỉnh sửa",
+      "ItemCount": "{count} mục",
+      "RemoveItem": "Xóa {item}",
+      "ImageCount": "{count} hình ảnh",
+      "StockAutoCalculated": "Tồn kho được tính tự động từ các biến thể",
+      "VariantInfo": "{images} hình ảnh, {stock} tồn kho",
+      "Placeholders": {
+        "Name": "Nhập tên sản phẩm",
+        "Slug": "duong-dan-san-pham",
+        "Brand": "Nhập tên thương hiệu",
+        "ListPrice": "0.00",
+        "Price": "0.00",
+        "CountInStock": "0",
+        "Tags": "Thêm nhãn",
+        "Colors": "Thêm màu sắc",
+        "Sizes": "Thêm kích cỡ",
+        "Description": "Nhập mô tả sản phẩm"
+      },
+      "Messages": {
+        "ProductCreated": "Tạo sản phẩm thành công",
+        "ProductUpdated": "Cập nhật sản phẩm thành công",
+        "ImageUploaded": "Tải hình ảnh lên thành công",
+        "VariantImageUploaded": "Tải hình ảnh biến thể lên thành công",
+        "SelectColor": "Vui lòng chọn màu trước",
+        "VariantSaved": "Lưu biến thể thành công",
+        "VariantSaveFailed": "Lưu biến thể thất bại",
+        "AddColorsFirst": "Vui lòng thêm màu sắc cho sản phẩm trước khi quản lý biến thể"
+      }
+    },
+    "orders": {
+      "title": "Quản lý đơn hàng",
+      "id": "Mã",
+      "date": "Ngày đặt",
+      "buyer": "Người mua",
+      "status": "Trạng thái",
+      "total": "Tổng tiền",
+      "paid": "Thanh toán",
+      "delivered": "Giao hàng",
+      "actions": "Thao tác",
+      "noOrders": "Không tìm thấy đơn hàng",
+      "deletedUser": "Người dùng đã xóa",
+      "details": "Chi tiết",
+      "adminPermissionRequired": "Yêu cầu quyền quản trị viên",
+      "deleteSuccess": "Xóa đơn hàng thành công",
+      "deleteConfirm": "Bạn có chắc chắn muốn xóa đơn hàng này?",
+      "statuses": {
+        "Pending": "Chờ xử lý",
+        "Processing": "Đang xử lý",
+        "Delivered": "Đã giao",
+        "Cancelled": "Đã hủy"
+      },
+      "no": "Không",
+      "yes": "Có"
+    }
+
+
   },
 "Wishlist": {
   "Added to wishlist": "Đã thêm vào danh sách yêu thích",
@@ -288,13 +550,14 @@
     "and": "và",
     "Privacy Notice": "Chính sách quyền riêng tư",
     "Already have an account?": "Bạn đã có tài khoản?",
-    "Sign in": "Đăng nhập"
+    "Sign in": "Đăng nhập",
+    "Email account already in use": "Email đã được sử dụng"
     
   },
     "Account": {
     "Your Account": "Tài khoản của bạn",
+    "Status": "Trạng thái",
     "Login & Security": "Đăng nhập & Bảo mật",
-    "Your Orders": "Đơn hàng cuả bạn",
     "Manage Addresses": "Quản lý điểm giao hàng",
     "Manage Payment": "Quản lý thanh toán",
     "Manage Subscription": "Quản lý đăng ký",
@@ -430,9 +693,98 @@
   "Your address": "Địa chỉ của bạn",
   "Choose a payment method": "Chọn phương thức thanh toán",
   "Shipping Address": "Địa chỉ giao hàng",
-  "View Order": "Xem đơn hàng"
-}
-
-
-
+  "View Order": "Xem đơn hàng",
+   "Footer": {
+    "NeedHelp": "Cần trợ giúp? Xem <helpLink>Trung tâm Trợ giúp</helpLink> hoặc <contactLink>Liên hệ Chúng tôi</contactLink>",
+    "OrderTerms": "Đối với mặt hàng đặt từ {siteName}: Khi bạn nhấp vào nút 'Đặt hàng', chúng tôi sẽ gửi email xác nhận đã nhận đơn hàng của bạn. Hợp đồng mua hàng sẽ chỉ hoàn tất khi chúng tôi gửi email thông báo rằng mặt hàng đã được giao cho bạn. Bằng cách đặt hàng, bạn đồng ý với <privacyLink>chính sách bảo mật</privacyLink> và <termsLink>điều khoản sử dụng</termsLink> của {siteName}.",
+    "ReturnPolicy": "Trong vòng 30 ngày kể từ khi nhận hàng, bạn có thể trả lại hàng hóa mới, chưa mở hộp trong tình trạng nguyên bản. Có một số ngoại lệ và hạn chế. <returnLink>Xem Chính sách Đổi trả của {siteName}.</returnLink>"
+  }
+},
+"BrandsTags": {
+    "Title": "Quản lý Thương hiệu & Nhãn",
+    "Description": "Xem và quản lý thương hiệu và nhãn sản phẩm",
+    "TotalBrands": "Tổng số Thương hiệu",
+    "ActiveBrands": "Thương hiệu đang hoạt động",
+    "TotalTags": "Tổng số Nhãn",
+    "TagsInUse": "Nhãn đang sử dụng",
+    "FailedToLoadStatistics": "Không tải được thống kê",
+    "FailedToLoadBrands": "Không tải được danh sách thương hiệu",
+    "FailedToLoadTags": "Không tải được danh sách nhãn",
+    "Products": "sản phẩm",
+    "Sold": "Đã bán",
+    "AvgRating": "Đánh giá TB",
+    "ViewProducts": "Xem sản phẩm",
+    "Brands": "Thương hiệu",
+    "Tags": "Nhãn"
+  },
+  "Order": {
+    "shippingAddress": "Địa chỉ giao hàng",
+    "paymentMethod": "Phương thức thanh toán",
+    "orderItems": "Danh sách đơn hàng",
+    "orderSummary": "Tóm tắt đơn hàng",
+    "table": {
+      "item": "Sản phẩm",
+      "quantity": "Số lượng",
+      "color": "Màu sắc",
+      "size": "Kích cỡ",
+      "price": "Giá"
+    },
+    "summary": {
+      "items": "Sản phẩm",
+      "tax": "Thuế",
+      "shipping": "Phí vận chuyển",
+      "total": "Tổng cộng"
+    },
+    "status": {
+      "cancelled": "ĐÃ HỦY (bởi {by})",
+      "byAdmin": "Quản trị viên",
+      "byYou": "Khách hàng",
+      "cancelledAt": "Đã hủy lúc {date}",
+      "delivered": "ĐÃ GIAO",
+      "deliveredAt": "Đã giao lúc {date}",
+      "processing": "ĐANG XỬ LÝ",
+      "expectedDelivery": "Dự kiến giao hàng lúc {date}",
+      "pending": "CHỜ XỬ LÝ",
+      "waitingPayment": "Đang chờ xác nhận thanh toán"
+    },
+    "payment": {
+      "paidAt": "Đã thanh toán lúc {date}",
+      "notPaid": "Chưa thanh toán"
+    },
+    "actions": {
+      "payOrder": "Thanh toán đơn hàng",
+      "markAsPaid": "Đánh dấu đã thanh toán",
+      "markAsDelivered": "Đánh dấu đã giao hàng",
+      "cancelOrder": "Hủy đơn hàng",
+      "cancelOrderAdmin": "Hủy đơn hàng (Admin)"
+    },
+    "cancelConfirm": {
+      "title": "Bạn có chắc chắn?",
+      "paidMessage": "Đơn hàng này đã được thanh toán. Việc hủy đơn sẽ yêu cầu hoàn tiền.",
+      "unpaidMessage": "Hành động này không thể hoàn tác. Đơn hàng sẽ bị hủy.",
+      "cancelButton": "Hủy bỏ",
+      "confirmButton": "Xác nhận hủy",
+      "cancelling": "Đang hủy..."
+    },
+    "cancelSuccess": "Đơn hàng đã được hủy thành công",
+    "cancelError": "Hủy đơn hàng thất bại"
+  },
+  "OrderStatus": {
+    "Cancelled": "Đã hủy",
+    "Delivered": "Đã giao",
+    "Processing": "Đang xử lý",
+    "Pending": "Chờ xử lý"
+  },
+   "Sort": {
+    "PriceLowToHigh": "Giá: Thấp đến cao",
+    "PriceHighToLow": "Giá: Cao đến thấp",
+    "NewestArrivals": "Hàng mới về",
+    "AvgCustomerReview": "Đánh giá trung bình",
+    "BestSelling": "Bán chạy nhất"
+  },
+  "Price": {
+    "Range1": "24.000đ đến 480.000đ",
+    "Range2": "504.000đ đến 1.200.000đ",
+    "Range3": "1.224.000đ đến 24.000.000đ"
+  }
 }

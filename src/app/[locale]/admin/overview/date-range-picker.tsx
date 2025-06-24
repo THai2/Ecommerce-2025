@@ -63,7 +63,16 @@ export function CalendarDateRangePicker({
             mode='range'
             defaultMonth={defaultDate?.from}
             selected={calendarDate}
-            onSelect={setCalendarDate}
+            //onSelect={setCalendarDate}
+            onSelect={(range) => {
+              if (range?.from && !range.to) {
+                // Nếu chỉ chọn 1 ngày, gán from = to để biểu thị một ngày duy nhất
+                setCalendarDate({ from: range.from, to: range.from })
+              } else {
+                setCalendarDate(range)
+              }
+            }}
+
             numberOfMonths={2}
           />
           <div className='flex gap-4 p-4 pt-0'>

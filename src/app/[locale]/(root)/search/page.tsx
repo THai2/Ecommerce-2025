@@ -16,71 +16,6 @@ import CollapsibleOnMobile from '@/components/shared/collapsible-on-mobile'
 import { getTranslations } from 'next-intl/server'
 import { IProduct } from '@/models/product'
 
-const sortOrders = [
-  { value: 'price-low-to-high', name: 'Price: Low to high' },
-  { value: 'price-high-to-low', name: 'Price: High to low' },
-  { value: 'newest-arrivals', name: 'Newest arrivals' },
-  { value: 'avg-customer-review', name: 'Avg. customer review' },
-  { value: 'best-selling', name: 'Best selling' },
-]
-
-const prices = [
-  {
-    name: '$1 to $20',
-    value: '1-20',
-  },
-  {
-    name: '$21 to $50',
-    value: '21-50',
-  },
-  {
-    name: '$51 to $1000',
-    value: '51-1000',
-  },
-]
-
-export async function generateMetadata(props: {
-  searchParams: Promise<{
-    q: string
-    category: string
-    tag: string
-    price: string
-    rating: string
-    sort: string
-    page: string
-  }>
-}) {
-  const searchParams = await props.searchParams
-  const t = await getTranslations()
-  const {
-    q = 'all',
-    category = 'all',
-    tag = 'all',
-    price = 'all',
-    rating = 'all',
-  } = searchParams
-
-  if (
-    (q !== 'all' && q !== '') ||
-    category !== 'all' ||
-    tag !== 'all' ||
-    rating !== 'all' ||
-    price !== 'all'
-  ) {
-    return {
-      title: `${t('Search.Search')} ${q !== 'all' ? q : ''}
-          ${category !== 'all' ? ` : ${t('Search.Category')} ${category}` : ''}
-          ${tag !== 'all' ? ` : ${t('Search.Tag')} ${tag}` : ''}
-          ${price !== 'all' ? ` : ${t('Search.Price')} ${price}` : ''}
-          ${rating !== 'all' ? ` : ${t('Search.Rating')} ${rating}` : ''}`,
-    }
-  } else {
-    return {
-      title: t('Search.Search Products'),
-    }
-  }
-}
-
 export default async function SearchPage(props: {
   searchParams: Promise<{
     q: string
@@ -93,6 +28,30 @@ export default async function SearchPage(props: {
   }>
 }) {
   const searchParams = await props.searchParams
+  const t = await getTranslations()
+
+  const sortOrders = [
+    { value: 'price-low-to-high', name: t('Sort.PriceLowToHigh') },
+    { value: 'price-high-to-low', name: t('Sort.PriceHighToLow') },
+    { value: 'newest-arrivals', name: t('Sort.NewestArrivals') },
+    { value: 'avg-customer-review', name: t('Sort.AvgCustomerReview') },
+    { value: 'best-selling', name: t('Sort.BestSelling') },
+  ]
+
+  const prices = [
+    {
+      name: t('Price.Range1', { from: '24.000đ', to: '480.000đ' }),
+      value: '1-20',
+    },
+    {
+      name: t('Price.Range2', { from: '504.000đ', to: '1.200.000đ' }),
+      value: '21-50',
+    },
+    {
+      name: t('Price.Range3', { from: '1.224.000đ', to: '24.000.000đ' }),
+      value: '51-1000',
+    },
+  ]
 
   const {
     q = 'all',
@@ -100,7 +59,7 @@ export default async function SearchPage(props: {
     tag = 'all',
     price = 'all',
     rating = 'all',
-    sort = 'best-selling',
+    sort = 'price-low-to-high', // Default to price low to high
     page = '1',
   } = searchParams
 
@@ -117,7 +76,7 @@ export default async function SearchPage(props: {
     page: Number(page),
     sort,
   })
-  const t = await getTranslations()
+
   return (
     <div>
       <div className='my-2 bg-card md:border-b  flex-between flex-col md:flex-row '>

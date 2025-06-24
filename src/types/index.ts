@@ -45,6 +45,8 @@ export type IOrderList = IOrderInput & {
     email: string
   }
   createdAt: Date
+  isCancelled: boolean
+
 }
 export type Cart = z.infer<typeof CartSchema>
 export type ShippingAddress = z.infer<typeof ShippingAddressSchema>

@@ -83,7 +83,7 @@ export default async function WishlistPage() {
                 <div className="flex items-center justify-between">
                   <span className="font-bold">${product.price.toFixed(2)}</span>
                   <form action={handleRemoveFromWishlist}>
-                    <input type="hidden" name="productId" value={product._id} />
+                    <input type="hidden" name="productId" value={product._id.toString()} />
                     <Button
                       type="submit"
                       variant="ghost"

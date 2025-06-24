@@ -67,9 +67,10 @@ export default function SalesAreaChart({ data }: { data: any[] }) {
   const { theme } = useTheme()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { cssColors, color } = useColorStore(theme)
-  
+
   // Lấy màu stroke hiện tại
   const currentStrokeColor = STROKE_COLORS[color.name][theme || 'light']
+  data.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
   return (
     <ResponsiveContainer width='100%' height={400}>

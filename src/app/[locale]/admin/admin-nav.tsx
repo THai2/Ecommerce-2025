@@ -8,48 +8,50 @@ import { useTranslations } from 'next-intl'
 
 const links = [
   {
-    title: 'Overview',
+    title: 'Nav.Overview',
     href: '/admin/overview',
   },
   {
-    title: 'Products',
+    title: 'Nav.Products',
     href: '/admin/products',
   },
-     {
-    title: 'Categories',
+  {
+    title: 'Nav.Categories',
     href: '/admin/categories',
   },
-     {
-    title: 'Brands & Tags',
+  {
+    title: 'Nav.BrandsTags',
     href: '/admin/brands&tags',
   },
   {
-    title: 'Orders',
+    title: 'Nav.Orders',
     href: '/admin/orders',
   },
   {
-    title: 'Users',
+    title: 'Nav.Users',
     href: '/admin/users',
   },
   {
-    title: 'Carousel',
+    title: 'Nav.Carousel',
     href: '/admin/carousels',
   },
   {
-    title: 'Pages',
+    title: 'Nav.Pages',
     href: '/admin/web-pages',
   },
   {
-    title: 'Settings',
+    title: 'Nav.Settings',
     href: '/admin/settings',
   },
 ]
+
 export function AdminNav({
   className,
   ...props
 }: React.HTMLAttributes<HTMLElement>) {
   const pathname = usePathname()
   const t = useTranslations('Admin')
+
   return (
     <nav
       className={cn(

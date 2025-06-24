@@ -31,53 +31,52 @@ import { toSlug } from '@/lib/utils'
 import { IProductInput } from '@/types'
 import { toast } from 'sonner'
 import { ImageUploader, ImagePreview } from '@/components/shared/image-uploader'
-import { getProductVariants, upsertProductVariant } from '@/lib/actions/product-variant.action'
+import { getProductVariants, upsertProductVariant, updateProductTotalStock } from '@/lib/actions/product-variant.action'
 import { useTranslations } from 'next-intl'
-
+import { CategorySelect } from '@/components/shared/category/category-select'
 
 const productDefaultValues: IProductInput =
   process.env.NODE_ENV === 'development'
     ? {
-        name: 'Sample Product',
-        slug: 'sample-product',
-        category: 'Sample Category',
-        images: ['/images/p11-1.jpg'],
-        brand: 'Sample Brand',
-        description: 'This is a sample description of the product.',
-        price: 99.99,
-        listPrice: 0,
-        countInStock: 15,
-        numReviews: 0,
-        avgRating: 0,
-        numSales: 0,
-        isPublished: false,
-        tags: ['new arrival'],
-        sizes: ['S', 'M', 'L'],
-        colors: ['White', 'Red', 'Black'],
-        ratingDistribution: [],
-        reviews: [],
-      }
+      name: 'Sample Product',
+      slug: 'sample-product',
+      category: 'Sample Category',
+      images: ['/images/p11-1.jpg'],
+      brand: 'Sample Brand',
+      description: 'This is a sample description of the product.',
+      price: 99.99,
+      listPrice: 0,
+      countInStock: 0,
+      numReviews: 0,
+      avgRating: 0,
+      numSales: 0,
+      isPublished: false,
+      tags: ['new arrival'],
+      sizes: ['S', 'M', 'L'],
+      colors: ['White', 'Red', 'Black'],
+      ratingDistribution: [],
+      reviews: [],
+    }
     : {
-        name: '',
-        slug: '',
-        category: '',
-        images: [],
-        brand: '',
-        description: '',
-        price: 0,
-        listPrice: 0,
-        countInStock: 0,
-        numReviews: 0,
-        avgRating: 0,
-        numSales: 0,
-        isPublished: false,
-        tags: [],
-        sizes: [],
-        colors: [],
-        ratingDistribution: [],
-        reviews: [],
-      }
-      
+      name: '',
+      slug: '',
+      category: '',
+      images: [],
+      brand: '',
+      description: '',
+      price: 0,
+      listPrice: 0,
+      countInStock: 0,
+      numReviews: 0,
+      avgRating: 0,
+      numSales: 0,
+      isPublished: false,
+      tags: [],
+      sizes: [],
+      colors: [],
+      ratingDistribution: [],
+      reviews: [],
+    }
 
 // Optimized component for managing arrays (tags, colors, sizes)
 const ArrayFieldManager = ({
@@ -97,10 +96,10 @@ const ArrayFieldManager = ({
 }) => {
   const [inputValue, setInputValue] = useState('')
   const [showSuggestions, setShowSuggestions] = useState(false)
-  
+  const t = useTranslations('Admin.Products')
 
   const filteredSuggestions = suggestions.filter(
-    suggestion => 
+    suggestion =>
       suggestion.toLowerCase().includes(inputValue.toLowerCase()) &&
       !items.includes(suggestion)
   )
@@ -136,7 +135,7 @@ const ArrayFieldManager = ({
         {label}
         {items.length > 0 && (
           <span className="text-xs text-muted-foreground">
-            {items.length} item{items.length !== 1 ? 's' : ''}
+            {t('ItemCount', { count: items.length })}
           </span>
         )}
       </FormLabel>
@@ -153,8 +152,8 @@ const ArrayFieldManager = ({
               onKeyPress={handleKeyPress}
               onFocus={() => setShowSuggestions(inputValue.length > 0 && suggestions.length > 0)}
             />
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               onClick={handleAdd}
               disabled={!inputValue.trim() || items.includes(inputValue.trim())}
               size="sm"
@@ -163,7 +162,7 @@ const ArrayFieldManager = ({
               <Plus className="h-4 w-4" />
             </Button>
           </div>
-          
+
           {/* Suggestions dropdown */}
           {showSuggestions && filteredSuggestions.length > 0 && (
             <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg max-h-40 overflow-y-auto">
@@ -185,9 +184,9 @@ const ArrayFieldManager = ({
         {items.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {items.map((item: string) => (
-              <Badge 
-                key={item} 
-                variant="secondary" 
+              <Badge
+                key={item}
+                variant="secondary"
                 className="flex items-center gap-1 hover:bg-destructive/10 transition-colors group"
               >
                 <span>{item}</span>
@@ -195,32 +194,12 @@ const ArrayFieldManager = ({
                   type="button"
                   onClick={() => onRemove(item)}
                   className="hover:text-destructive transition-colors"
-                  aria-label={`Remove ${item}`}
+                  aria-label={t('RemoveItem', { item })}
                 >
                   <X className="h-3 w-3" />
                 </button>
               </Badge>
             ))}
-          </div>
-        )}
-
-        {/* Bulk actions */}
-        {items.length > 1 && (
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                if (confirm(`Are you sure you want to remove all ${items.length} ${label.toLowerCase()}?`)) {
-                  items.forEach(item => onRemove(item))
-                }
-              }}
-              className="text-destructive hover:text-destructive"
-            >
-              <Trash2 className="h-3 w-3 mr-1" />
-              Clear All
-            </Button>
           </div>
         )}
       </div>
@@ -229,43 +208,53 @@ const ArrayFieldManager = ({
   )
 }
 
-// Common suggestions for better UX
-const COMMON_TAGS = ['new arrival', 'bestseller', 'sale', 'limited edition', 'premium', 'eco-friendly', 'trending', 'seasonal']
+// Common suggestions
+const COMMON_TAGS = ['new-arrival', 'best-seller', 'todays-deal', 'featured', 'may-sale-2025', 'june-sale-2025', 'summer-sale-2025', 'winter-sale-2025']
 const COMMON_COLORS = ['White', 'Black', 'Red', 'Blue', 'Green', 'Yellow', 'Pink', 'Purple', 'Orange', 'Gray', 'Brown', 'Navy', 'Beige']
-const COMMON_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', '28', '30', '32', '34', '36', '38', '40', '42']
+const COMMON_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', '28','29', '30','31', '32', '34', '36', '38', '39','40', '42']
 
 // Component for managing variants
-const ProductVariantManager = ({ 
-  productId, 
-  colors, 
-  sizes 
-}: { 
+const ProductVariantManager = ({
+  productId,
+  colors,
+  sizes,
+  onStockUpdate
+}: {
   productId: string
   colors: string[]
   sizes: string[]
+  onStockUpdate?: (totalStock: number) => void
 }) => {
   const [variants, setVariants] = useState<IProductVariant[]>([])
   const [selectedColor, setSelectedColor] = useState<string>('')
   const [variantImages, setVariantImages] = useState<string[]>([])
   const [sizeStocks, setSizeStocks] = useState<{ size: string; stock: number }[]>([])
   const [loading, setLoading] = useState(false)
-  
-  const t = useTranslations()
+  const [totalStock, setTotalStock] = useState(0)
 
-  // Load variants when component mounts
+  const t = useTranslations('Admin.Products')
+
   useEffect(() => {
     const loadVariants = async () => {
       const data = await getProductVariants(productId)
       setVariants(data)
+      calculateTotalStock(data)
     }
     loadVariants()
   }, [productId])
 
-  // Initialize size stocks when color is selected
+  const calculateTotalStock = (variantList: IProductVariant[]) => {
+    const total = variantList.reduce((sum, variant) => {
+      return sum + variant.sizeStock.reduce((sizeSum, sizeStock) => sizeSum + sizeStock.stock, 0)
+    }, 0)
+    setTotalStock(total)
+    onStockUpdate?.(total)
+  }
+
   const handleColorSelect = (color: string) => {
     setSelectedColor(color)
     const existingVariant = variants.find(v => v.color === color)
-    
+
     if (existingVariant) {
       setVariantImages(existingVariant.images)
       setSizeStocks(existingVariant.sizeStock)
@@ -275,30 +264,26 @@ const ProductVariantManager = ({
     }
   }
 
-  // Handle image upload for variant
   const handleVariantImageUploaded = (imageData: { url: string; path: string }) => {
     setVariantImages(prev => [...prev, imageData.url])
-    toast.success('Variant image uploaded successfully')
+    toast.success(t('Messages.VariantImageUploaded'))
   }
 
-  // Remove variant image
   const handleVariantImageRemove = (imageUrl: string) => {
     setVariantImages(prev => prev.filter(img => img !== imageUrl))
   }
 
-  // Update size stock
   const handleSizeStockChange = (size: string, stock: number) => {
-    setSizeStocks(prev => 
-      prev.map(item => 
+    setSizeStocks(prev =>
+      prev.map(item =>
         item.size === size ? { ...item, stock } : item
       )
     )
   }
 
-  // Save variant
   const handleSaveVariant = async () => {
     if (!selectedColor) {
-      toast.error('Please select a color')
+      toast.error(t('Messages.SelectColor'))
       return
     }
 
@@ -312,15 +297,16 @@ const ProductVariantManager = ({
       })
 
       if (result.success) {
-        toast.success('Variant saved successfully')
-        // Reload variants
+        toast.success(t('Messages.VariantSaved'))
         const updatedVariants = await getProductVariants(productId)
         setVariants(updatedVariants)
+        calculateTotalStock(updatedVariants)
+        await updateProductTotalStock(productId)
       } else {
         toast.error(result.message)
       }
     } catch (error) {
-      toast.error('Failed to save variant')
+      toast.error(t('Messages.VariantSaveFailed'))
     } finally {
       setLoading(false)
     }
@@ -329,17 +315,37 @@ const ProductVariantManager = ({
   if (colors.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
-        <p>Please add colors in the Basic Information tab first to manage variants.</p>
+        <p>{t('Messages.AddColorsFirst')}</p>
       </div>
     )
   }
 
-
   return (
     <div className="space-y-6">
-      {/* Color Selection */}
+      <div className="bg-muted p-4 rounded-lg">
+        <h3 className="text-lg font-medium mb-2">{t('StockSummary')}</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-primary">{totalStock}</div>
+            <div className="text-sm text-muted-foreground">{t('TotalStock')}</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold">{variants.length}</div>
+            <div className="text-sm text-muted-foreground">{t('Variants')}</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold">{colors.length}</div>
+            <div className="text-sm text-muted-foreground">{t('Colors')}</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold">{sizes.length}</div>
+            <div className="text-sm text-muted-foreground">{t('Sizes')}</div>
+          </div>
+        </div>
+      </div>
+
       <div>
-        <label className="text-sm font-medium">{t('Admin-Products.Select Color to Manage')}</label>
+        <label className="text-sm font-medium">{t('SelectColorToManage')}</label>
         <div className="flex flex-wrap gap-2 mt-2">
           {colors.map((color) => (
             <Button
@@ -357,11 +363,10 @@ const ProductVariantManager = ({
 
       {selectedColor && (
         <div className="space-y-4">
-          <h3 className="text-lg font-medium">{t('Admin-Products.Managing:')} {selectedColor}</h3>
-          
-          {/* Variant Images */}
+          <h3 className="text-lg font-medium">{t('Managing', { color: selectedColor })}</h3>
+
           <div>
-            <label className="text-sm font-medium">{t('Admin-Products.Images for')} {selectedColor}</label>
+            <label className="text-sm font-medium">{t('ImagesFor', { color: selectedColor })}</label>
             <Card>
               <CardContent className="space-y-4 mt-4 min-h-48">
                 <div className="flex flex-wrap gap-3">
@@ -373,21 +378,20 @@ const ProductVariantManager = ({
                     />
                   ))}
                 </div>
-                <ImageUploader 
-                  onImageUploaded={handleVariantImageUploaded} 
+                <ImageUploader
+                  onImageUploaded={handleVariantImageUploaded}
                   productSlug={`${productId}-${selectedColor}`}
                 />
               </CardContent>
             </Card>
           </div>
 
-          {/* Size Stock Management */}
           <div>
-            <label className="text-sm font-medium">{t('Admin-Products.Stock by Size')} </label>
+            <label className="text-sm font-medium">{t('StockBySize')}</label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
               {sizeStocks.map((item) => (
                 <div key={item.size} className="space-y-2">
-                  <label className="text-sm">{item.size}</label>
+                  <label className="text-sm font-medium">{item.size}</label>
                   <Input
                     type="number"
                     min="0"
@@ -397,30 +401,36 @@ const ProductVariantManager = ({
                 </div>
               ))}
             </div>
+            <div className="mt-2 text-sm text-muted-foreground">
+              {t('VariantTotal', { 
+                total: sizeStocks.reduce((sum, s) => sum + s.stock, 0) 
+              })}
+            </div>
           </div>
 
-          {/* Save Button */}
-          <Button 
+          <Button
             type="button"
             onClick={handleSaveVariant}
             disabled={loading}
           >
-            {loading ? 'Saving...' : 'Save Variant'}
+            {loading ? t('Saving') : t('SaveVariant')}
           </Button>
         </div>
       )}
 
-      {/* Variants Summary */}
       {variants.length > 0 && (
         <div>
-          <h3 className="text-lg font-medium mb-4">{t('Admin-Products.Existing Variants')} </h3>
+          <h3 className="text-lg font-medium mb-4">{t('ExistingVariants')}</h3>
           <div className="space-y-2">
             {variants.map((variant) => (
               <div key={variant._id} className="flex items-center justify-between p-3 border rounded">
                 <div>
                   <span className="font-medium">{variant.color}</span>
                   <span className="text-sm text-gray-500 ml-2">
-                    {variant.images.length} {t('Admin-Products.images,')}  {variant.sizeStock.reduce((sum, s) => sum + s.stock, 0)} {t('Admin-Products.total stock')} 
+                    {t('VariantInfo', {
+                      images: variant.images.length,
+                      stock: variant.sizeStock.reduce((sum, s) => sum + s.stock, 0)
+                    })}
                   </span>
                 </div>
                 <Button
@@ -429,7 +439,7 @@ const ProductVariantManager = ({
                   size="sm"
                   onClick={() => handleColorSelect(variant.color)}
                 >
-                  Edit
+                  {t('Edit')}
                 </Button>
               </div>
             ))}
@@ -450,6 +460,7 @@ const ProductForm = ({
   productId?: string
 }) => {
   const router = useRouter()
+  const t = useTranslations('Admin.Products')
 
   const form = useForm({
     resolver:
@@ -464,14 +475,17 @@ const ProductForm = ({
   const colors = form.watch('colors') || []
   const sizes = form.watch('sizes') || []
 
+  const handleStockUpdate = (totalStock: number) => {
+    form.setValue('countInStock', totalStock)
+  }
+
   async function onSubmit(values: IProductInput) {
     if (type === 'Create') {
       const res = await createProduct(values)
       if (!res.success) {
         toast.error(res.message)
       } else {
-        toast.success(res.message)
-        // Redirect to update form to manage variants
+        toast.success(t('Messages.ProductCreated'))
         router.push(`/admin/products`)
       }
     }
@@ -484,24 +498,23 @@ const ProductForm = ({
       if (!res.success) {
         toast.error(res.message)
       } else {
-        toast.success('Product updated successfully')
+        toast.success(t('Messages.ProductUpdated'))
       }
     }
   }
 
-  // Image handling
   const images = form.watch('images') || []
   const [imagePaths, setImagePaths] = useState<Record<string, string>>({})
-  
+
   const handleImageUploaded = (imageData: { url: string; path: string }) => {
     form.setValue('images', [...images, imageData.url])
     setImagePaths(prev => ({
       ...prev,
       [imageData.url]: imageData.path
     }))
-    toast.success('Image uploaded successfully')
+    toast.success(t('Messages.ImageUploaded'))
   }
-  
+
   const handleImageRemove = (imageUrl: string) => {
     form.setValue('images', images.filter(img => img !== imageUrl))
     const imagePath = imagePaths[imageUrl]
@@ -512,7 +525,6 @@ const ProductForm = ({
     }
   }
 
-  // Array field handlers
   const handleAddTag = (tag: string) => {
     form.setValue('tags', [...tags, tag])
   }
@@ -537,19 +549,17 @@ const ProductForm = ({
     form.setValue('sizes', sizes.filter(size => size !== sizeToRemove))
   }
 
-  const t = useTranslations()
-
   return (
     <div className="space-y-6">
       {type === 'Update' ? (
         <Tabs defaultValue="basic" className="w-full">
           <TabsList>
-            <TabsTrigger value="basic">{t('Admin-Products.Basic Information')} </TabsTrigger>
-            <TabsTrigger value="variants">{t('Admin-Products.Variants & Stock')}</TabsTrigger>
+            <TabsTrigger value="basic">{t('BasicInformation')}</TabsTrigger>
+            <TabsTrigger value="variants">{t('VariantsAndStock')}</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="basic">
-            <ProductBasicForm 
+            <ProductBasicForm
               form={form}
               onSubmit={onSubmit}
               type={type}
@@ -568,19 +578,20 @@ const ProductForm = ({
               handleRemoveSize={handleRemoveSize}
             />
           </TabsContent>
-          
+
           <TabsContent value="variants">
             {productId && (
-              <ProductVariantManager 
+              <ProductVariantManager
                 productId={productId}
                 colors={colors}
                 sizes={sizes}
+                onStockUpdate={handleStockUpdate}
               />
             )}
           </TabsContent>
         </Tabs>
       ) : (
-        <ProductBasicForm 
+        <ProductBasicForm
           form={form}
           onSubmit={onSubmit}
           type={type}
@@ -603,10 +614,9 @@ const ProductForm = ({
   )
 }
 
-// Separate component for the basic form
-const ProductBasicForm = ({ 
-  form, 
-  onSubmit, 
+const ProductBasicForm = ({
+  form,
+  onSubmit,
   type,
   images,
   imagePaths,
@@ -621,128 +631,240 @@ const ProductBasicForm = ({
   sizes,
   handleAddSize,
   handleRemoveSize
-}: any) => (
-  <Form {...form}>
-    <form
-      method='post'
-      onSubmit={form.handleSubmit(onSubmit)}
-      className='space-y-8'
-    >
-      {/* Basic Info Fields */}
-      <div className='flex flex-col gap-5 md:flex-row'>
-        <FormField
-          control={form.control}
-          name='name'
-          render={({ field }) => (
-            <FormItem className='w-full'>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input placeholder='Enter product name' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+}: any) => {
+  const t = useTranslations('Admin.Products')
 
-        <FormField
-          control={form.control}
-          name='slug'
-          render={({ field }) => (
-            <FormItem className='w-full'>
-              <FormLabel>Slug</FormLabel>
-              <FormControl>
-                <div className='relative'>
-                  <Input
-                    placeholder='Enter product slug'
-                    className='pr-20'
-                    {...field}
+  return (
+    <Form {...form}>
+      <form
+        method='post'
+        onSubmit={form.handleSubmit(onSubmit)}
+        className='space-y-8'
+      >
+        <div className='flex flex-col gap-5 md:flex-row'>
+          <FormField
+            control={form.control}
+            name='name'
+            render={({ field }) => (
+              <FormItem className='w-full'>
+                <FormLabel>{t('Name')}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t('Placeholders.Name')} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name='slug'
+            render={({ field }) => (
+              <FormItem className='w-full'>
+                <FormLabel>{t('Slug')}</FormLabel>
+                <FormControl>
+                  <div className='relative'>
+                    <Input
+                      placeholder={t('Placeholders.Slug')}
+                      className='pr-20'
+                      {...field}
+                    />
+                    <Button
+                      type='button'
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        form.setValue('slug', toSlug(form.getValues('name')))
+                      }}
+                      className='absolute right-1 top-1'
+                    >
+                      {t('Generate')}
+                    </Button>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className='flex flex-col gap-5 md:flex-row'>
+          <FormField
+            control={form.control}
+            name='category'
+            render={({ field }) => (
+              <FormItem className='w-full'>
+                <FormLabel>{t('Category')}</FormLabel>
+                <FormControl>
+                  <CategorySelect
+                    value={field.value}
+                    onChange={field.onChange}
+                    required
                   />
-                  <Button
-                    type='button'
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      form.setValue('slug', toSlug(form.getValues('name')))
-                    }}
-                    className='absolute right-1 top-1'
-                  >
-                    Generate
-                  </Button>
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-      <div className='flex flex-col gap-5 md:flex-row'>
+          <FormField
+            control={form.control}
+            name='brand'
+            render={({ field }) => (
+              <FormItem className='w-full'>
+                <FormLabel>{t('Brand')}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t('Placeholders.Brand')} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className='flex flex-col gap-5 md:flex-row'>
+          <FormField
+            control={form.control}
+            name='listPrice'
+            render={({ field }) => (
+              <FormItem className='w-full'>
+                <FormLabel>{t('ListPrice')}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t('Placeholders.ListPrice')} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='price'
+            render={({ field }) => (
+              <FormItem className='w-full'>
+                <FormLabel>{t('NetPrice')}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t('Placeholders.Price')} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='countInStock'
+            render={({ field }) => (
+              <FormItem className='w-full'>
+                <FormLabel>{t('CountInStock')}</FormLabel>
+                <FormControl>
+                  <Input
+                    type='number'
+                    placeholder={t('Placeholders.CountInStock')}
+                    {...field}
+                    readOnly={type === 'Update'}
+                  />
+                </FormControl>
+                {type === 'Update' && (
+                  <FormDescription>
+                    {t('StockAutoCalculated')}
+                  </FormDescription>
+                )}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className='flex flex-col gap-5 md:flex-row'>
+          <FormField
+            control={form.control}
+            name='images'
+            render={() => (
+              <FormItem className='w-full'>
+                <FormLabel className="flex items-center justify-between">
+                  {t('Images')}
+                  {images.length > 0 && (
+                    <span className="text-xs text-muted-foreground">
+                      {t('ImageCount', { count: images.length })}
+                    </span>
+                  )}
+                </FormLabel>
+                <Card>
+                  <CardContent className='space-y-4 mt-4 min-h-48'>
+                    <div className='flex flex-wrap gap-3'>
+                      {images.map((imageUrl: string) => (
+                        <ImagePreview
+                          key={imageUrl}
+                          imageUrl={imageUrl}
+                          onRemove={() => handleImageRemove(imageUrl)}
+                        />
+                      ))}
+                    </div>
+                    <FormControl>
+                      <ImageUploader onImageUploaded={handleImageUploaded} productSlug={''} />
+                    </FormControl>
+                  </CardContent>
+                </Card>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
         <FormField
           control={form.control}
-          name='category'
-          render={({ field }) => (
-            <FormItem className='w-full'>
-              <FormLabel>Category</FormLabel>
-              <FormControl>
-                <Input placeholder='Enter category' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+          name='tags'
+          render={() => (
+            <ArrayFieldManager
+              label={t('Tags')}
+              placeholder={t('Placeholders.Tags')}
+              items={tags}
+              onAdd={handleAddTag}
+              onRemove={handleRemoveTag}
+              suggestions={COMMON_TAGS}
+            />
           )}
         />
 
         <FormField
           control={form.control}
-          name='brand'
-          render={({ field }) => (
-            <FormItem className='w-full'>
-              <FormLabel>Brand</FormLabel>
-              <FormControl>
-                <Input placeholder='Enter product brand' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+          name='colors'
+          render={() => (
+            <ArrayFieldManager
+              label={t('Colors')}
+              placeholder={t('Placeholders.Colors')}
+              items={colors}
+              onAdd={handleAddColor}
+              onRemove={handleRemoveColor}
+              suggestions={COMMON_COLORS}
+            />
           )}
         />
-      </div>
 
-      <div className='flex flex-col gap-5 md:flex-row'>
         <FormField
           control={form.control}
-          name='listPrice'
-          render={({ field }) => (
-            <FormItem className='w-full'>
-              <FormLabel>List Price</FormLabel>
-              <FormControl>
-                <Input placeholder='Enter product list price' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+          name='sizes'
+          render={() => (
+            <ArrayFieldManager
+              label={t('Sizes')}
+              placeholder={t('Placeholders.Sizes')}
+              items={sizes}
+              onAdd={handleAddSize}
+              onRemove={handleRemoveSize}
+              suggestions={COMMON_SIZES}
+            />
           )}
         />
+
         <FormField
           control={form.control}
-          name='price'
+          name='description'
           render={({ field }) => (
             <FormItem className='w-full'>
-              <FormLabel>Net Price</FormLabel>
+              <FormLabel>{t('Description')}</FormLabel>
               <FormControl>
-                <Input placeholder='Enter product price' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='countInStock'
-          render={({ field }) => (
-            <FormItem className='w-full'>
-              <FormLabel>Count In Stock</FormLabel>
-              <FormControl>
-                <Input
-                  type='number'
-                  placeholder='Enter product count in stock'
+                <Textarea
+                  placeholder={t('Placeholders.Description')}
+                  className='resize-none min-h-[100px]'
                   {...field}
                 />
               </FormControl>
@@ -750,146 +872,41 @@ const ProductBasicForm = ({
             </FormItem>
           )}
         />
-      </div>
 
-      {/* Images */}
-      <div className='flex flex-col gap-5 md:flex-row'>
         <FormField
           control={form.control}
-          name='images'
-          render={() => (
-            <FormItem className='w-full'>
-              <FormLabel className="flex items-center justify-between">
-                Images
-                {images.length > 0 && (
-                  <span className="text-xs text-muted-foreground">
-                    {images.length} image{images.length !== 1 ? 's' : ''}
-                  </span>
-                )}
-              </FormLabel>
-              <Card>
-                <CardContent className='space-y-4 mt-4 min-h-48'>
-                  <div className='flex flex-wrap gap-3'>
-                    {images.map((imageUrl: string) => (
-                      <ImagePreview
-                        key={imageUrl}
-                        imageUrl={imageUrl}
-                        onRemove={() => handleImageRemove(imageUrl)}
-                      />
-                    ))}
-                  </div>
-                  <FormControl>
-                    <ImageUploader onImageUploaded={handleImageUploaded} productSlug={''} />
-                  </FormControl>
-                </CardContent>
-              </Card>
-              <FormMessage />
+          name='isPublished'
+          render={({ field }) => (
+            <FormItem className='flex flex-row items-start space-x-3 space-y-0'>
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className='space-y-1 leading-none'>
+                <FormLabel>
+                  {t('PublishProduct')}
+                </FormLabel>
+                <FormDescription>
+                  {t('PublishDescription')}
+                </FormDescription>
+              </div>
             </FormItem>
           )}
         />
-      </div>
 
-      {/* Tags */}
-      <FormField
-        control={form.control}
-        name='tags'
-        render={() => (
-          <ArrayFieldManager
-            label="Tags"
-            placeholder="Add new tag"
-            items={tags}
-            onAdd={handleAddTag}
-            onRemove={handleRemoveTag}
-            suggestions={COMMON_TAGS}
-          />
-        )}
-      />
-
-      {/* Colors */}
-      <FormField
-        control={form.control}
-        name='colors'
-        render={() => (
-          <ArrayFieldManager
-            label="Colors"
-            placeholder="Add new color"
-            items={colors}
-            onAdd={handleAddColor}
-            onRemove={handleRemoveColor}
-            suggestions={COMMON_COLORS}
-          />
-        )}
-      />
-
-      {/* Sizes */}
-      <FormField
-        control={form.control}
-        name='sizes'
-        render={() => (
-          <ArrayFieldManager
-            label="Sizes"
-            placeholder="Add new size"
-            items={sizes}
-            onAdd={handleAddSize}
-            onRemove={handleRemoveSize}
-            suggestions={COMMON_SIZES}
-          />
-        )}
-      />
-
-      {/* Description */}
-      <FormField
-        control={form.control}
-        name='description'
-        render={({ field }) => (
-          <FormItem className='w-full'>
-            <FormLabel>Description</FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder='Enter product description'
-                className='resize-none min-h-[100px]'
-                {...field}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      {/* Published */}
-      <FormField
-        control={form.control}
-        name='isPublished'
-        render={({ field }) => (
-          <FormItem className='flex flex-row items-start space-x-3 space-y-0'>
-            <FormControl>
-              <Checkbox
-                checked={field.value}
-                onCheckedChange={field.onChange}
-              />
-            </FormControl>
-            <div className='space-y-1 leading-none'>
-              <FormLabel>
-                Publish Product
-              </FormLabel>
-              <FormDescription>
-                Make this product visible to customers
-              </FormDescription>
-            </div>
-          </FormItem>
-        )}
-      />
-
-      <Button
-        type='submit'
-        size='lg'
-        disabled={form.formState.isSubmitting}
-        className='button col-span-2 w-full'
-      >
-        {form.formState.isSubmitting ? 'Submitting...' : `${type} Product`}
-      </Button>
-    </form>
-  </Form>
-)
+        <Button
+          type='submit'
+          size='lg'
+          disabled={form.formState.isSubmitting}
+          className='button col-span-2 w-full'
+        >
+          {form.formState.isSubmitting ? t('Submitting') : `${type} ${t('Product')}`}
+        </Button>
+      </form>
+    </Form>
+  )
+}
 
 export default ProductForm

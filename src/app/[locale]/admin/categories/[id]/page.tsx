@@ -23,9 +23,11 @@ import {
 import { formatDateTime } from '@/lib/utils'
 import DeleteDialog from '@/components/shared/delete-dialog'
 import { deleteProduct, getProductsByCategory } from '@/lib/actions/product.actions'
+import { useTranslations } from 'next-intl'
 
 export default function CategoryDetailPage() {
   const params = useParams()
+  const t = useTranslations('Admin.Categories.Detail')
   const [category, setCategory] = useState<any>(null)
   const [products, setProducts] = useState<IProduct[]>([])
   const [loading, setLoading] = useState(true)
@@ -46,19 +48,18 @@ export default function CategoryDetailPage() {
       // Fetch category
       const categoryResult = await getCategoryById(id)
       if (!categoryResult.success) {
-        throw new Error('Failed to fetch category')
+        throw new Error(t('Messages.FetchCategoryError'))
       }
       setCategory(categoryResult.category)
       
       // Fetch products by category name
       const productsResult = await getProductsByCategory(categoryResult.category.name, page, limit)
       
-      console.log(productsResult)
       if (productsResult.success) {
         setProducts(productsResult.products)
         setTotalProducts(productsResult.pagination?.total || 0)
       } else {
-        throw new Error('Failed to fetch products')
+        throw new Error(t('Messages.FetchProductsError'))
       }
     } catch (error: any) {
       toast.error(error.message)
@@ -72,6 +73,7 @@ export default function CategoryDetailPage() {
   }
 
   const handleDeleteSuccess = () => {
+    toast.success(t('Messages.DeleteSuccess'))
     fetchData(params.id as string)
   }
 
@@ -79,6 +81,7 @@ export default function CategoryDetailPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <span className="sr-only">{t('Loading')}</span>
       </div>
     )
   }
@@ -87,9 +90,9 @@ export default function CategoryDetailPage() {
     return (
       <div className="container mx-auto py-6">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600">Category Not Found</h1>
+          <h1 className="text-2xl font-bold text-red-600">{t('CategoryNotFound')}</h1>
           <Link href="/admin/categories">
-            <Button className="mt-4">Back to Categories</Button>
+            <Button className="mt-4">{t('BackToCategories')}</Button>
           </Link>
         </div>
       </div>
@@ -102,18 +105,18 @@ export default function CategoryDetailPage() {
         <Link href="/admin/categories">
           <Button variant="ghost" className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Categories
+            {t('BackToCategories')}
           </Button>
         </Link>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">{category.name}</h1>
-            <p className="text-gray-600 mt-1">Category Details</p>
+            <p className="text-gray-600 mt-1">{t('Title')}</p>
           </div>
           <Link href={`/admin/categories/${category._id}/edit`}>
             <Button>
               <Edit className="w-4 h-4 mr-2" />
-              Edit Category
+              {t('EditCategory')}
             </Button>
           </Link>
         </div>
@@ -123,25 +126,25 @@ export default function CategoryDetailPage() {
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Category Information</CardTitle>
+              <CardTitle>{t('CategoryInformation')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-gray-500">Name</label>
+                <label className="text-sm font-medium text-gray-500">{t('Name')}</label>
                 <p className="text-lg font-medium">{category.name}</p>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-500">Slug</label>
+                <label className="text-sm font-medium text-gray-500">{t('Slug')}</label>
                 <p className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
                   {category.slug}
                 </p>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-500">Description</label>
+                <label className="text-sm font-medium text-gray-500">{t('Description')}</label>
                 <p className="text-gray-700">
-                  {category.description || 'No description provided'}
+                  {category.description || t('NoDescription')}
                 </p>
               </div>
             </CardContent>
@@ -150,18 +153,18 @@ export default function CategoryDetailPage() {
           {/* Products Section */}
           <Card className="mt-6">
             <CardHeader>
-              <CardTitle>Products in this Category ({totalProducts})</CardTitle>
+              <CardTitle>{t('ProductsInCategory', { count: totalProducts })}</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead className="text-right">Price</TableHead>
-                    <TableHead>Stock</TableHead>
-                    <TableHead>Published</TableHead>
-                    <TableHead>Last Update</TableHead>
-                    <TableHead className="w-[100px]">Actions</TableHead>
+                    <TableHead>{t('ProductName')}</TableHead>
+                    <TableHead className="text-right">{t('Price')}</TableHead>
+                    <TableHead>{t('Stock')}</TableHead>
+                    <TableHead>{t('Published')}</TableHead>
+                    <TableHead>{t('LastUpdate')}</TableHead>
+                    <TableHead className="w-[100px]">{t('Actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -174,13 +177,13 @@ export default function CategoryDetailPage() {
                       </TableCell>
                       <TableCell className="text-right">${product.price}</TableCell>
                       <TableCell>{product.countInStock}</TableCell>
-                      <TableCell>{product.isPublished ? 'Yes' : 'No'}</TableCell>
+                      <TableCell>{product.isPublished ? t('Yes') : t('No')}</TableCell>
                       <TableCell>
                         {formatDateTime(product.updatedAt).dateTime}
                       </TableCell>
                       <TableCell className="flex gap-1">
                         <Button asChild variant="outline" size="sm">
-                          <Link href={`/admin/products/${product._id}`}>Edit</Link>
+                          <Link href={`/admin/products/${product._id}`}>{t('Edit')}</Link>
                         </Button>
                         <DeleteDialog
                           id={product._id}
@@ -200,15 +203,20 @@ export default function CategoryDetailPage() {
                     onClick={() => handlePageChange(page - 1)}
                     disabled={page <= 1}
                   >
-                    Previous
+                    {t('Previous')}
                   </Button>
-                  <span>Page {page} of {Math.ceil(totalProducts / limit)}</span>
+                  <span>
+                    {t('PageInfo', { 
+                      current: page, 
+                      total: Math.ceil(totalProducts / limit) 
+                    })}
+                  </span>
                   <Button
                     variant="outline"
                     onClick={() => handlePageChange(page + 1)}
                     disabled={page >= Math.ceil(totalProducts / limit)}
                   >
-                    Next
+                    {t('Next')}
                   </Button>
                 </div>
               )}
@@ -219,14 +227,14 @@ export default function CategoryDetailPage() {
         <div>
           <Card>
             <CardHeader>
-              <CardTitle>Status & Metadata</CardTitle>
+              <CardTitle>{t('StatusMetadata')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-gray-500">Status</label>
+                <label className="text-sm font-medium text-gray-500">{t('Status')}</label>
                 <div className="mt-1">
                   <Badge variant={category.isActive ? 'default' : 'secondary'}>
-                    {category.isActive ? 'Active' : 'Inactive'}
+                    {category.isActive ? t('Active') : t('Inactive')}
                   </Badge>
                 </div>
               </div>
@@ -234,7 +242,7 @@ export default function CategoryDetailPage() {
               <div>
                 <label className="text-sm font-medium text-gray-500 flex items-center gap-2">
                   <Hash className="w-4 h-4" />
-                  Category ID
+                  {t('CategoryID')}
                 </label>
                 <p className="font-mono text-xs text-gray-600">{category._id}</p>
               </div>
@@ -242,7 +250,7 @@ export default function CategoryDetailPage() {
               <div>
                 <label className="text-sm font-medium text-gray-500 flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  Created
+                  {t('Created')}
                 </label>
                 <p className="text-sm">
                   {new Date(category.createdAt).toLocaleDateString('en-US', {
@@ -258,7 +266,7 @@ export default function CategoryDetailPage() {
               <div>
                 <label className="text-sm font-medium text-gray-500 flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  Last Updated
+                  {t('LastUpdated')}
                 </label>
                 <p className="text-sm">
                   {new Date(category.updatedAt).toLocaleDateString('en-US', {

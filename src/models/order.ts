@@ -5,6 +5,9 @@ export interface IOrder extends Document, IOrderInput {
   _id: string
   createdAt: Date
   updatedAt: Date
+  isCancelled: boolean // Thêm trường mới
+  cancelledAt: Date // Thêm trường mới
+  cancelledBy?: string // 'user' hoặc 'admin'
 }
 
 const orderSchema = new Schema<IOrder>(
@@ -54,6 +57,9 @@ const orderSchema = new Schema<IOrder>(
     isDelivered: { type: Boolean, required: true, default: false },
     deliveredAt: { type: Date },
     createdAt: { type: Date, default: Date.now },
+    isCancelled: { type: Boolean, required: true, default: false },
+    cancelledAt: { type: Date },
+    cancelledBy: { type: String }, // 'user' hoặc 'admin'
   },
   {
     timestamps: true,

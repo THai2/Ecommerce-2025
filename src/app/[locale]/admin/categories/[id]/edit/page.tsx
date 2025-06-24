@@ -14,10 +14,12 @@ import { ArrowLeft, Save } from 'lucide-react'
 import { ICategory } from '@/models/category'
 import { toast } from 'sonner'
 import { getCategoryById, updateCategory } from '@/lib/actions/category.action'
+import { useTranslations } from 'next-intl'
 
 export default function EditCategoryPage() {
   const params = useParams()
   const router = useRouter()
+  const t = useTranslations('Admin.Categories')
   const [loading, setLoading] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
   const [formData, setFormData] = useState({
@@ -45,11 +47,11 @@ export default function EditCategoryPage() {
           isActive: category.isActive
         })
       } else {
-        toast.error('Failed to fetch category')
+        toast.error(t('Messages.FetchError'))
         router.push('/admin/categories')
       }
     } catch (error) {
-      toast.error('Error loading category')
+      toast.error(t('Messages.LoadError'))
       router.push('/admin/categories')
     } finally {
       setInitialLoading(false)
@@ -78,7 +80,7 @@ export default function EditCategoryPage() {
     e.preventDefault()
     
     if (!formData.name.trim()) {
-      toast.error('Category name is required')
+      toast.error(t('Messages.NameRequired'))
       return
     }
 
@@ -92,13 +94,13 @@ export default function EditCategoryPage() {
       })
 
       if (result.success) {
-        toast.success('Category updated successfully')
+        toast.success(t('Messages.UpdateSuccess'))
         router.push('/admin/categories')
       } else {
-        toast.error(result.error || 'Failed to update category')
+        toast.error(result.error || t('Messages.UpdateError'))
       }
     } catch (error) {
-      toast.error('Error updating category')
+      toast.error(t('Messages.UpdateError'))
     } finally {
       setLoading(false)
     }
@@ -108,6 +110,7 @@ export default function EditCategoryPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <span className="sr-only">{t('Loading')}</span>
       </div>
     )
   }
@@ -118,11 +121,11 @@ export default function EditCategoryPage() {
         <Link href="/admin/categories">
           <Button variant="ghost" className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Categories
+            {t('BackToCategories')}
           </Button>
         </Link>
-        <h1 className="text-3xl font-bold">Edit Category</h1>
-        <p className="text-gray-600 mt-1">Update category information</p>
+        <h1 className="text-3xl font-bold">{t('EditCategory')}</h1>
+        <p className="text-gray-600 mt-1">{t('UpdateInfo')}</p>
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -130,40 +133,40 @@ export default function EditCategoryPage() {
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle>Category Information</CardTitle>
+                <CardTitle>{t('CategoryInformation')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="name">Category Name *</Label>
+                  <Label htmlFor="name">{t('NameLabel')} *</Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={handleNameChange}
-                    placeholder="Enter category name"
+                    placeholder={t('NamePlaceholder')}
                     required
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="slug">Slug</Label>
+                  <Label htmlFor="slug">{t('SlugLabel')}</Label>
                   <Input
                     id="slug"
                     value={formData.slug}
                     onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                    placeholder="category-slug"
+                    placeholder={t('SlugPlaceholder')}
                   />
                   <p className="text-sm text-gray-500 mt-1">
-                    URL-friendly version of the name. Auto-generated from name.
+                    {t('SlugDescription')}
                   </p>
                 </div>
 
                 <div>
-                  <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="description">{t('DescriptionLabel')}</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder="Enter category description"
+                    placeholder={t('DescriptionPlaceholder')}
                     rows={4}
                   />
                 </div>
@@ -174,7 +177,7 @@ export default function EditCategoryPage() {
           <div>
             <Card>
               <CardHeader>
-                <CardTitle>Category Settings</CardTitle>
+                <CardTitle>{t('SettingsTitle')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center space-x-2">
@@ -185,10 +188,10 @@ export default function EditCategoryPage() {
                       setFormData(prev => ({ ...prev, isActive: checked as boolean }))
                     }
                   />
-                  <Label htmlFor="isActive">Active</Label>
+                  <Label htmlFor="isActive">{t('ActiveLabel')}</Label>
                 </div>
                 <p className="text-sm text-gray-500">
-                  Active categories will be visible to customers
+                  {t('ActiveDescription')}
                 </p>
               </CardContent>
             </Card>
@@ -202,18 +205,18 @@ export default function EditCategoryPage() {
                 {loading ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Updating...
+                    {t('Updating')}
                   </>
                 ) : (
                   <>
                     <Save className="w-4 h-4 mr-2" />
-                    Update Category
+                    {t('UpdateButton')}
                   </>
                 )}
               </Button>
               <Link href="/admin/categories">
                 <Button type="button" variant="outline">
-                  Cancel
+                  {t('CancelButton')}
                 </Button>
               </Link>
             </div>

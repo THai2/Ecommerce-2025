@@ -12,9 +12,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowLeft, Save } from 'lucide-react'
 import { toast } from 'sonner'
 import { createCategory } from '@/lib/actions/category.action'
+import { useTranslations } from 'next-intl'
 
 export default function CreateCategoryPage() {
   const router = useRouter()
+  const t = useTranslations('Admin.Categories')
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
@@ -45,7 +47,7 @@ export default function CreateCategoryPage() {
     e.preventDefault()
     
     if (!formData.name.trim()) {
-      toast.error('Category name is required')
+      toast.error(t('Messages.CategoryNameRequired'))
       return
     }
 
@@ -59,14 +61,14 @@ export default function CreateCategoryPage() {
       })
 
       if (result.success) {
-        toast.success('Category created successfully')
+        toast.success(t('Messages.CategoryCreated'))
         router.push('/admin/categories')
       } else {
-        toast.error(result.error || 'Failed to create category')
+        toast.error(result.error || t('Messages.CategoryCreateFailed'))
       }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      toast.error('Error creating category')
+      toast.error(t('Messages.ErrorCreatingCategory'))
     } finally {
       setLoading(false)
     }
@@ -78,11 +80,11 @@ export default function CreateCategoryPage() {
         <Link href="/admin/categories">
           <Button variant="ghost" className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Categories
+            {t('BackToCategories')}
           </Button>
         </Link>
-        <h1 className="text-3xl font-bold">Create New Category</h1>
-        <p className="text-gray-600 mt-1">Add a new product category</p>
+        <h1 className="text-3xl font-bold">{t('CreateNewCategory')}</h1>
+        <p className="text-gray-600 mt-1">{t('AddNewProductCategory')}</p>
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -90,40 +92,40 @@ export default function CreateCategoryPage() {
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle>Category Information</CardTitle>
+                <CardTitle>{t('CategoryInformation')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="name">Category Name *</Label>
+                  <Label htmlFor="name">{t('CategoryName')} *</Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={handleNameChange}
-                    placeholder="Enter category name"
+                    placeholder={t('Placeholders.CategoryName')}
                     required
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="slug">Slug</Label>
+                  <Label htmlFor="slug">{t('Slug')}</Label>
                   <Input
                     id="slug"
                     value={formData.slug}
                     onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                    placeholder="category-slug"
+                    placeholder={t('Placeholders.Slug')}
                   />
                   <p className="text-sm text-gray-500 mt-1">
-                    URL-friendly version of the name. Auto-generated from name.
+                    {t('SlugDescription')}
                   </p>
                 </div>
 
                 <div>
-                  <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="description">{t('Description')}</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder="Enter category description"
+                    placeholder={t('Placeholders.Description')}
                     rows={4}
                   />
                 </div>
@@ -134,7 +136,7 @@ export default function CreateCategoryPage() {
           <div>
             <Card>
               <CardHeader>
-                <CardTitle>Category Settings</CardTitle>
+                <CardTitle>{t('CategorySettings')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center space-x-2">
@@ -145,10 +147,10 @@ export default function CreateCategoryPage() {
                       setFormData(prev => ({ ...prev, isActive: checked as boolean }))
                     }
                   />
-                  <Label htmlFor="isActive">Active</Label>
+                  <Label htmlFor="isActive">{t('Active')}</Label>
                 </div>
                 <p className="text-sm text-gray-500">
-                  Active categories will be visible to customers
+                  {t('ActiveDescription')}
                 </p>
               </CardContent>
             </Card>
@@ -162,18 +164,18 @@ export default function CreateCategoryPage() {
                 {loading ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Creating...
+                    {t('Creating')}
                   </>
                 ) : (
                   <>
                     <Save className="w-4 h-4 mr-2" />
-                    Create Category
+                    {t('CreateCategory')}
                   </>
                 )}
               </Button>
               <Link href="/admin/categories">
                 <Button type="button" variant="outline">
-                  Cancel
+                  {t('Cancel')}
                 </Button>
               </Link>
             </div>

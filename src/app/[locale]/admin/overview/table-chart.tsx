@@ -41,28 +41,63 @@ export default function TableChart({
   labelType = 'month',
   data = [],
 }: TableChartProps) {
-  const max = Math.max(...data.map((item) => item.value))
-  const dataWithPercentage = data.map((x) => ({
+  // Process data to merge duplicates and handle broken images
+  const processedData = data.reduce((acc, current) => {
+    // If labelType is product, merge duplicates
+    if (labelType === 'product') {
+      const existingItem = acc.find(item => item.label === current.label)
+      if (existingItem) {
+        // Merge values for duplicate products
+        existingItem.value += current.value
+        // Keep the first valid image found
+        if (!existingItem.image && current.image) {
+          existingItem.image = current.image
+        }
+        return acc
+      }
+    }
+    
+    return [...acc, { ...current }]
+  }, [] as typeof data)
+
+  const max = Math.max(...processedData.map((item) => item.value))
+  const dataWithPercentage = processedData.map((x) => ({
     ...x,
     label: labelType === 'month' ? getMonthName(x.label) : x.label,
-    percentage: Math.round((x.value / max) * 100),
+    percentage: max > 0 ? Math.round((x.value / max) * 100) : 0,
   }))
+
   return (
     <div className='space-y-3'>
       {dataWithPercentage.map(({ label, id, value, image, percentage }) => (
         <div
-          key={label}
-          className='grid grid-cols-[100px_1fr_80px] md:grid-cols-[250px_1fr_80px] gap-2 space-y-4  '
+          key={`${label}-${id || ''}`}
+          className='grid grid-cols-[100px_1fr_80px] md:grid-cols-[250px_1fr_80px] gap-2 space-y-4'
         >
-          {image ? (
-            <Link className='flex items-end' href={`/admin/products/${id}`}>
-              <Image
-                className='rounded border  aspect-square object-scale-down max-w-full h-auto mx-auto mr-1'
-                src={image!}
-                alt={label}
-                width={36}
-                height={36}
-              />
+          {labelType === 'product' ? (
+            <Link 
+              className='flex items-end' 
+              href={id ? `/admin/products/${id}` : '#'}
+            >
+              <div className='relative w-9 h-9 rounded border mr-1 flex items-center justify-center bg-gray-100'>
+                {image ? (
+                  <Image
+                    className='rounded border aspect-square object-scale-down'
+                    src={image}
+                    alt={label}
+                    width={36}
+                    height={36}
+                    onError={(e) => {
+                      // Fallback to empty image if error occurs
+                      const target = e.target as HTMLImageElement
+                      target.onerror = null
+                      target.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzNiIgaGVpZ2h0PSIzNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNjY2MiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cmVjdCB4PSIzIiB5PSIzIiB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHJ4PSIyIiByeT0iMiIvPjxjaXJjbGUgY3g9IjguNSIgY3k9IjguNSIgcj0iMS41Ii8+PHBhdGggZD0iTTIxIDE1bC01LjYtNS42YTIgMiAwIDAgMC0yLjggMEwzIDE2Ii8+PC9zdmc+'
+                    }}
+                  />
+                ) : (
+                  <div className='text-gray-400 text-xs'>No Image</div>
+                )}
+              </div>
               <p className='text-center text-sm whitespace-nowrap overflow-hidden text-ellipsis'>
                 {label}
               </p>

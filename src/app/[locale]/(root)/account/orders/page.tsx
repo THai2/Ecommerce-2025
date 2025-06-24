@@ -16,11 +16,38 @@ import { formatDateTime, formatId } from '@/lib/utils'
 import BrowsingHistoryList from '@/components/shared/browsing-history-list'
 import ProductPrice from '@/components/shared/product/product-price'
 import { getTranslations } from 'next-intl/server'
+import { Badge } from '@/components/ui/badge'
 
 const PAGE_TITLE = 'Your Orders'
 export const metadata: Metadata = {
   title: PAGE_TITLE,
 }
+
+function getOrderStatus(order: IOrder) {
+  if (order.isCancelled) {
+    return {
+      text: 'Cancelled',
+      variant: 'destructive' as const,
+    }
+  }
+  if (order.isDelivered) {
+    return {
+      text: 'Delivered',
+      variant: 'default' as const,
+    }
+  }
+  if (order.isPaid) {
+    return {
+      text: 'Processing',
+      variant: 'default' as const,
+    }
+  }
+  return {
+    text: 'Pending',
+    variant: 'outline' as const,
+  }
+}
+
 export default async function OrdersPage(props: {
   searchParams: Promise<{ page: string }>
 }) {
@@ -44,6 +71,7 @@ export default async function OrdersPage(props: {
             <TableRow>
               <TableHead>Id</TableHead>
               <TableHead>{t('Account.Date')}</TableHead>
+              <TableHead>{t('Account.Status')}</TableHead>
               <TableHead>{t('Account.Total')}</TableHead>
               <TableHead>{t('Account.Paid')}</TableHead>
               <TableHead>{t('Account.Delivered')}</TableHead>
@@ -53,41 +81,57 @@ export default async function OrdersPage(props: {
           <TableBody>
             {orders.data.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className=''>
+                <TableCell colSpan={7} className=''>
                   {t('Account.You have no orders')}
                 </TableCell>
               </TableRow>
             )}
-            {orders.data.map((order: IOrder) => (
-              <TableRow key={order._id}>
-                <TableCell>
-                  <Link href={`/account/orders/${order._id}`}>
-                    {formatId(order._id)}
-                  </Link>
-                </TableCell>
-                <TableCell>
-                  {formatDateTime(order.createdAt!).dateTime}
-                </TableCell>
-                <TableCell>
-                  <ProductPrice price={order.totalPrice} plain />
-                </TableCell>
-                <TableCell>
-                  {order.isPaid && order.paidAt
-                    ? formatDateTime(order.paidAt).dateTime
-                    : 'No'}
-                </TableCell>
-                <TableCell>
-                  {order.isDelivered && order.deliveredAt
-                    ? formatDateTime(order.deliveredAt).dateTime
-                    : 'No'}
-                </TableCell>
-                <TableCell>
-                  <Link href={`/account/orders/${order._id}`}>
-                    <span className='px-2'>{t('Account.Details')}</span>
-                  </Link>
-                </TableCell>
-              </TableRow>
-            ))}
+            {orders.data.map((order: IOrder) => {
+              const status = getOrderStatus(order)
+              return (
+                <TableRow key={order._id}>
+                  <TableCell>
+                    <Link href={`/account/orders/${order._id}`}>
+                      {formatId(order._id)}
+                    </Link>
+                  </TableCell>
+                  <TableCell>
+                    {formatDateTime(order.createdAt!).dateTime}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={status.variant}>
+                      {t(`OrderStatus.${status.text}`)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <ProductPrice price={order.totalPrice} plain />
+                  </TableCell>
+                  <TableCell>
+                    {order.isPaid && order.paidAt ? (
+                      <Badge>
+                        {formatDateTime(order.paidAt).dateTime}
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline">No</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {order.isDelivered && order.deliveredAt ? (
+                      <Badge>
+                        {formatDateTime(order.deliveredAt).dateTime}
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline">No</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Link href={`/account/orders/${order._id}`}>
+                      <span className='px-2'>{t('Account.Details')}</span>
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
           </TableBody>
         </Table>
         {orders.totalPages > 1 && (

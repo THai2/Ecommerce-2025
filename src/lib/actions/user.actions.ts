@@ -11,12 +11,36 @@ import { revalidatePath } from 'next/cache'
 import { getSetting } from './setting.actions'
 import { z } from 'zod'
 
+// export async function signInWithCredentials(user: IUserSignIn) {
+//   return await signIn('credentials', { ...user, redirect: false })
+// }
+
 export async function signInWithCredentials(user: IUserSignIn) {
-  return await signIn('credentials', { ...user, redirect: false })
+  try {
+    // Check if the user exists and is blocked
+    await connectToDatabase();
+    const dbUser = await User.findOne({ email: user.email });
+
+    if (!dbUser) {
+      throw new Error('User not found');
+    }
+
+    if (dbUser.isBlocked) {
+      throw new Error('Your account has been blocked. Please contact support.');
+    }
+
+    // Proceed with sign-in if not blocked
+    return await signIn('credentials', { ...user, redirect: false });
+  } catch (error) {
+    throw new Error(formatError(error));
+  }
 }
 export const SignOut = async () => {
   const redirectTo = await signOut({ redirect: false })
   redirect(redirectTo.redirect)
+}
+export const SignInWithGoogle = async () => {
+  await signIn('google')
 }
 
 // CREATE
@@ -137,4 +161,3 @@ export async function getUserById(userId: string) {
   if (!user) throw new Error('User not found')
   return JSON.parse(JSON.stringify(user)) as IUser
 }
-

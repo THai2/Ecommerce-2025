@@ -406,3 +406,217 @@ export async function getCategoriesWithProductCount() {
     return { success: false, error: error.message }
   }
 }
+
+//BRANDS AND TAGS ACTIONS
+// Lấy tất cả brands với số lượng sản phẩm
+export async function getBrandsWithProductCount() {
+  try {
+    await connectToDatabase()
+    
+    const brands = await Product.aggregate([
+      { $match: { isPublished: true } },
+      { 
+        $group: { 
+          _id: '$brand', 
+          productCount: { $sum: 1 },
+          totalSales: { $sum: '$numSales' },
+          avgRating: { $avg: '$avgRating' }
+        } 
+      },
+      { 
+        $project: { 
+          _id: 0, 
+          brand: '$_id', 
+          productCount: 1,
+          totalSales: 1,
+          avgRating: { $round: ['$avgRating', 1] }
+        } 
+      },
+      { $sort: { productCount: -1 } }
+    ])
+    
+    return { success: true, brands }
+  } catch (error: any) {
+    return { success: false, error: formatError(error) }
+  }
+}
+
+// Lấy tất cả tags với số lượng sản phẩm
+export async function getTagsWithProductCount() {
+  try {
+    await connectToDatabase()
+    
+    const tags = await Product.aggregate([
+      { $match: { isPublished: true } },
+      { $unwind: '$tags' },
+      { 
+        $group: { 
+          _id: '$tags', 
+          productCount: { $sum: 1 },
+          totalSales: { $sum: '$numSales' },
+          avgRating: { $avg: '$avgRating' }
+        } 
+      },
+      { 
+        $project: { 
+          _id: 0, 
+          tag: '$_id', 
+          productCount: 1,
+          totalSales: 1,
+          avgRating: { $round: ['$avgRating', 1] }
+        } 
+      },
+      { $sort: { productCount: -1 } }
+    ])
+    
+    return { success: true, tags }
+  } catch (error: any) {
+    return { success: false, error: formatError(error) }
+  }
+}
+
+// Lấy sản phẩm theo brand
+export async function getProductsByBrand({
+  brand,
+  page = 1,
+  limit = 12,
+  sort = 'latest'
+}: {
+  brand: string
+  page?: number
+  limit?: number
+  sort?: string
+}) {
+  try {
+    await connectToDatabase()
+    
+    const order: Record<string, 1 | -1> =
+      sort === 'best-selling'
+        ? { numSales: -1 }
+        : sort === 'price-low-to-high'
+          ? { price: 1 }
+          : sort === 'price-high-to-low'
+            ? { price: -1 }
+            : sort === 'avg-customer-review'
+              ? { avgRating: -1 }
+              : { createdAt: -1 }
+    
+    const skip = (page - 1) * limit
+    
+    const products = await Product.find({ 
+      brand, 
+      isPublished: true 
+    })
+    .sort(order)
+    .skip(skip)
+    .limit(limit)
+    
+    const total = await Product.countDocuments({ 
+      brand, 
+      isPublished: true 
+    })
+    
+    return {
+      success: true,
+      products: JSON.parse(JSON.stringify(products)),
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      }
+    }
+  } catch (error: any) {
+    return { success: false, error: formatError(error) }
+  }
+}
+
+// Lấy sản phẩm theo tag (đã có sẵn trong code gốc, nhưng cải tiến thêm)
+export async function getProductsByTagEnhanced({
+  tag,
+  page = 1,
+  limit = 12,
+  sort = 'latest'
+}: {
+  tag: string
+  page?: number
+  limit?: number
+  sort?: string
+}) {
+  try {
+    await connectToDatabase()
+    
+    const order: Record<string, 1 | -1> =
+      sort === 'best-selling'
+        ? { numSales: -1 }
+        : sort === 'price-low-to-high'
+          ? { price: 1 }
+          : sort === 'price-high-to-low'
+            ? { price: -1 }
+            : sort === 'avg-customer-review'
+              ? { avgRating: -1 }
+              : { createdAt: -1 }
+    
+    const skip = (page - 1) * limit
+    
+    const products = await Product.find({ 
+      tags: { $in: [tag] }, 
+      isPublished: true 
+    })
+    .sort(order)
+    .skip(skip)
+    .limit(limit)
+    
+    const total = await Product.countDocuments({ 
+      tags: { $in: [tag] }, 
+      isPublished: true 
+    })
+    
+    return {
+      success: true,
+      products: JSON.parse(JSON.stringify(products)),
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      }
+    }
+  } catch (error: any) {
+    return { success: false, error: formatError(error) }
+  }
+}
+
+// Lấy thống kê tổng quan brands & tags
+export async function getBrandTagStatistics() {
+  try {
+    await connectToDatabase()
+    
+    const [brandStats, tagStats] = await Promise.all([
+      Product.aggregate([
+        { $match: { isPublished: true } },
+        { $group: { _id: '$brand' } },
+        { $count: 'totalBrands' }
+      ]),
+      Product.aggregate([
+        { $match: { isPublished: true } },
+        { $unwind: '$tags' },
+        { $group: { _id: '$tags' } },
+        { $count: 'totalTags' }
+      ])
+    ])
+    
+    const totalBrands = brandStats[0]?.totalBrands || 0
+    const totalTags = tagStats[0]?.totalTags || 0
+    
+    return {
+      success: true,
+      statistics: {
+        totalBrands,
+        totalTags
+      }
+    }
+  } catch (error: any) {
+    return { success: false, error: formatError(error) }
+  }
+}

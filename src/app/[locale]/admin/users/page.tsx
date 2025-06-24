@@ -56,7 +56,7 @@ export default async function AdminUser(props: {
                 <TableCell className='flex gap-1'>
                   <Button asChild variant='outline' size='sm'>
                     <Link href={`/admin/users/${user._id}`}>Edit</Link>
-                  </Button>
+                  </Button>                   
                   <DeleteDialog id={user._id} action={deleteUser} />
                 </TableCell>
               </TableRow>

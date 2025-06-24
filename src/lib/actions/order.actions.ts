@@ -14,6 +14,8 @@ import mongoose from 'mongoose'
 import Product from '@/models/product'
 import { auth } from '../../../auth'
 import User from '@/models/user'
+import ProductVariant from '@/models/product-variant'
+import { getTotalStock } from './product-variant.action'
 
 // CREATE
 export const createOrder = async (clientSideCart: Cart) => {
@@ -70,6 +72,7 @@ export async function updateOrderToPaid(orderId: string) {
     }>('user', 'name email')
     if (!order) throw new Error('Order not found')
     if (order.isPaid) throw new Error('Order is already paid')
+    if (order.isCancelled) throw new Error('Cannot pay cancelled order')
     order.isPaid = true
     order.paidAt = new Date()
     await order.save()
@@ -82,6 +85,40 @@ export async function updateOrderToPaid(orderId: string) {
     return { success: false, message: formatError(err) }
   }
 }
+// const updateProductStock = async (orderId: string) => {
+//   const session = await mongoose.connection.startSession()
+
+//   try {
+//     session.startTransaction()
+//     const opts = { session }
+
+//     const order = await Order.findOneAndUpdate(
+//       { _id: orderId },
+//       { isPaid: true, paidAt: new Date() },
+//       opts
+//     )
+//     if (!order) throw new Error('Order not found')
+
+//     for (const item of order.items) {
+//       const product = await Product.findById(item.product).session(session)
+//       if (!product) throw new Error('Product not found')
+
+//       product.countInStock -= item.quantity
+//       await Product.updateOne(
+//         { _id: product._id },
+//         { countInStock: product.countInStock },
+//         opts
+//       )
+//     }
+//     await session.commitTransaction()
+//     session.endSession()
+//     return true
+//   } catch (error) {
+//     await session.abortTransaction()
+//     session.endSession()
+//     throw error
+//   }
+// }
 const updateProductStock = async (orderId: string) => {
   const session = await mongoose.connection.startSession()
 
@@ -96,17 +133,40 @@ const updateProductStock = async (orderId: string) => {
     )
     if (!order) throw new Error('Order not found')
 
-    for (const item of order.items) {
-      const product = await Product.findById(item.product).session(session)
-      if (!product) throw new Error('Product not found')
+    // Lưu trữ các productId bị ảnh hưởng để cập nhật tổng stock
+    const affectedProductIds = new Set<string>()
 
-      product.countInStock -= item.quantity
-      await Product.updateOne(
-        { _id: product._id },
-        { countInStock: product.countInStock },
-        opts
+    for (const item of order.items) {
+      const { product, color, size, quantity } = item
+
+      // Cập nhật tồn kho size cụ thể trong variant
+      const variant = await ProductVariant.findOneAndUpdate(
+        {
+          productId: product,
+          color,
+          'sizeStock.size': size,
+        },
+        {
+          $inc: { 'sizeStock.$.stock': -quantity },
+        },
+        { session }
+      )
+
+      if (!variant) throw new Error(`Variant not found for ${product} - ${color} - ${size}`)
+
+      affectedProductIds.add(product)
+    }
+
+    // Cập nhật tổng stock của các product bị ảnh hưởng
+    for (const productId of affectedProductIds) {
+      const totalStock = await getTotalStock(productId)
+      await Product.findByIdAndUpdate(
+        productId,
+        { countInStock: totalStock },
+        { session }
       )
     }
+
     await session.commitTransaction()
     session.endSession()
     return true
@@ -116,6 +176,8 @@ const updateProductStock = async (orderId: string) => {
     throw error
   }
 }
+
+
 export async function deliverOrder(orderId: string) {
   try {
     await connectToDatabase()
@@ -265,6 +327,10 @@ export async function approvePayPalOrder(
         captureData.purchase_units[0]?.payments?.captures[0]?.amount?.value,
     }
     await order.save()
+
+      if (!process.env.MONGODB_URI?.startsWith('mongodb://localhost')) {
+      await updateProductStock(order._id.toString()) 
+    }
     await sendPurchaseReceipt({ order })
     revalidatePath(`/account/orders/${orderId}`)
     return {
@@ -326,23 +392,26 @@ export const calcDeliveryDateAndPrice = async ({
 // GET ORDERS BY USER
 export async function getOrderSummary(date: DateRange) {
   await connectToDatabase()
+  const from = new Date(date.from!)
+  const to = new Date(date.to!)
+  to.setHours(23, 59, 59, 999)
 
   const ordersCount = await Order.countDocuments({
     createdAt: {
-      $gte: date.from,
-      $lte: date.to,
+      $gte: from,
+      $lte: to,
     },
   })
   const productsCount = await Product.countDocuments({
     createdAt: {
-      $gte: date.from,
-      $lte: date.to,
+      $gte: from,
+      $lte: to,
     },
   })
   const usersCount = await User.countDocuments({
     createdAt: {
-      $gte: date.from,
-      $lte: date.to,
+      $gte: from,
+      $lte: to,
     },
   })
 
@@ -350,8 +419,8 @@ export async function getOrderSummary(date: DateRange) {
     {
       $match: {
         createdAt: {
-          $gte: date.from,
-          $lte: date.to,
+          $gte: from,
+          $lte: to,
         },
       },
     },
@@ -420,12 +489,15 @@ export async function getOrderSummary(date: DateRange) {
 }
 
 async function getSalesChartData(date: DateRange) {
+  const from = new Date(date.from!)
+  const to = new Date(date.to!)
+  to.setHours(23, 59, 59, 999)
   const result = await Order.aggregate([
     {
       $match: {
         createdAt: {
-          $gte: date.from,
-          $lte: date.to,
+          $gte: from,
+          $lte: to,
         },
       },
     },
@@ -461,12 +533,15 @@ async function getSalesChartData(date: DateRange) {
 }
 
 async function getTopSalesProducts(date: DateRange) {
+  const from = new Date(date.from!)
+  const to = new Date(date.to!)
+  to.setHours(23, 59, 59, 999)
   const result = await Order.aggregate([
     {
       $match: {
         createdAt: {
-          $gte: date.from,
-          $lte: date.to,
+          $gte: from,
+          $lte: to,
         },
       },
     },
@@ -512,12 +587,15 @@ async function getTopSalesProducts(date: DateRange) {
 }
 
 async function getTopSalesCategories(date: DateRange, limit = 5) {
+  const from = new Date(date.from!)
+  const to = new Date(date.to!)
+  to.setHours(23, 59, 59, 999)
   const result = await Order.aggregate([
     {
       $match: {
         createdAt: {
-          $gte: date.from,
-          $lte: date.to,
+          $gte: from,
+          $lte: to,
         },
       },
     },
@@ -537,4 +615,135 @@ async function getTopSalesCategories(date: DateRange, limit = 5) {
   ])
 
   return result
+}
+
+
+
+// Hủy đơn hàng bởi khách hàng
+export async function cancelOrderByUser(orderId: string) {
+  try {
+    await connectToDatabase()
+    const session = await auth()
+    if (!session) throw new Error('User not authenticated')
+
+    const order = await Order.findById(orderId)
+    if (!order) throw new Error('Order not found')
+    
+    // Kiểm tra xem đơn hàng có thuộc về người dùng này không
+    if (order.user.toString() !== session.user.id) {
+      throw new Error('Not authorized to cancel this order')
+    }
+    
+    // Kiểm tra trạng thái đơn hàng
+    if (order.isPaid) throw new Error('Cannot cancel paid order')
+    if (order.isCancelled) throw new Error('Order is already cancelled')
+    
+    // Cập nhật trạng thái hủy
+    order.isCancelled = true
+    order.cancelledAt = new Date()
+    order.cancelledBy = 'user'
+    await order.save()
+    
+    revalidatePath(`/account/orders/${orderId}`)
+    return { success: true, message: 'Order cancelled successfully' }
+  } catch (error) {
+    return { success: false, message: formatError(error) }
+  }
+}
+
+// Hủy đơn hàng bởi admin
+export async function cancelOrderByAdmin(orderId: string) {
+  try {
+    await connectToDatabase()
+    const session = await auth()
+    if (!session) throw new Error('Admin not authenticated')
+
+    // Kiểm tra quyền admin (bạn cần thêm logic kiểm tra role admin ở đây)
+    // Ví dụ: if (session.user.role !== 'admin') throw new Error('Not authorized')
+
+    const order = await Order.findById(orderId)
+    if (!order) throw new Error('Order not found')
+    
+    // Kiểm tra trạng thái đơn hàng
+    if (order.isDelivered) throw new Error('Cannot cancel delivered order')
+    if (order.isCancelled) throw new Error('Order is already cancelled')
+    
+    // Cập nhật trạng thái hủy
+    order.isCancelled = true
+    order.cancelledAt = new Date()
+    order.cancelledBy = 'admin'
+    await order.save()
+    
+    // Nếu đã thanh toán, cần hoàn tiền
+    if (order.isPaid) {
+      // Thêm logic hoàn tiền ở đây (PayPal, Stripe, etc.)
+      // Ví dụ: await refundPayment(order)
+    }
+    
+    // Nếu đã thanh toán, cập nhật lại tồn kho
+    if (order.isPaid && !process.env.MONGODB_URI?.startsWith('mongodb://localhost')) {
+      await restoreProductStock(order._id.toString())
+    }
+    
+    revalidatePath(`/admin/orders/${orderId}`)
+    return { success: true, message: 'Order cancelled successfully' }
+  } catch (error) {
+    return { success: false, message: formatError(error) }
+  }
+}
+
+// Hàm khôi phục tồn kho khi hủy đơn hàng
+const restoreProductStock = async (orderId: string) => {
+  const session = await mongoose.connection.startSession()
+
+  try {
+    session.startTransaction()
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const opts = { session }
+
+    const order = await Order.findById(orderId).session(session)
+    if (!order) throw new Error('Order not found')
+
+    // Lưu trữ các productId bị ảnh hưởng để cập nhật tổng stock
+    const affectedProductIds = new Set<string>()
+
+    for (const item of order.items) {
+      const { product, color, size, quantity } = item
+
+      // Cập nhật tồn kho size cụ thể trong variant
+      const variant = await ProductVariant.findOneAndUpdate(
+        {
+          productId: product,
+          color,
+          'sizeStock.size': size,
+        },
+        {
+          $inc: { 'sizeStock.$.stock': quantity }, // Tăng stock thay vì giảm
+        },
+        { session }
+      )
+
+      if (!variant) throw new Error(`Variant not found for ${product} - ${color} - ${size}`)
+
+      affectedProductIds.add(product)
+    }
+
+    // Cập nhật tổng stock của các product bị ảnh hưởng
+    for (const productId of affectedProductIds) {
+      const totalStock = await getTotalStock(productId)
+      await Product.findByIdAndUpdate(
+        productId,
+        { countInStock: totalStock },
+        { session }
+      )
+    }
+
+    await session.commitTransaction()
+    session.endSession()
+    return true
+  } catch (error) {
+    await session.abortTransaction()
+    session.endSession()
+    throw error
+  }
 }

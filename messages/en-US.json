@@ -120,7 +120,8 @@
     "Out of stock in": "Out of stock in",
     "items available": "items available",
     "left": "left",
-    "In stock": "In stock"
+    "In stock": "In stock",
+    "Only X left in stock - order soon": "Only {count} left in stock - order soon"
   },
   "Cart": {
     "Shopping Cart": "Shopping Cart",
@@ -171,7 +172,15 @@
     "No product found": "No product found",
     "Next": "Next",
     "Previous": "Previous",
-    "Page": "Page"
+    "Page": "Page",
+     "PriceLowToHigh": "Price: Low to high",
+    "PriceHighToLow": "Price: High to low",
+    "NewestArrivals": "Newest arrivals",
+    "AvgCustomerReview": "Avg. customer review",
+    "BestSelling": "Best selling",
+    "PriceRange1": "$1 to $20",
+    "PriceRange2": "$21 to $50",
+    "PriceRange3": "$51 to $1000" 
   },
   "Footer": {
     "Select a currency": "Select a currency",
@@ -203,7 +212,7 @@
   "Admin": {
     "Deleted User": "Deleted User",
     "Overview": "Overview",
-    "Products": "Products",
+    "Product": "Products",
     "Orders": "Orders",
     "Users": "Users",
     "Pages": "Pages",
@@ -231,7 +240,260 @@
     "Actions": "Actions",
     "Details": "Details",
     "Brands & Tags": "Brands & Tags",
-    "Categories": "Categories"
+    "Category": "Categories",
+     "BrandProducts": {
+    "BackToBrands": "Back to Brands",
+    "BrandTitle": "Brand: {brand}",
+    "BrandDescription": "All products from this brand",
+    "NoProductsFound": "No products found",
+    "NoProductsDescription": "This brand doesn't have any published products yet.",
+    "ShowingProducts": "Showing {start} - {end} of {total} products",
+    "SortBy": "Sort by:",
+    "SortPlaceholder": "Select sort option",
+    "SortOptions": {
+      "latest": "Newest",
+      "best-selling": "Best Selling",
+      "price-low-to-high": "Price: Low to High",
+      "price-high-to-low": "Price: High to Low",
+      "avg-customer-review": "Highest Rated"
+    },
+    "PageInfo": "Page {current} of {total}",
+    "Previous": "Previous",
+    "Next": "Next",
+    "Product": {
+      "InStock": "In Stock",
+      "OutOfStock": "Out of Stock",
+      "View": "View",
+      "Edit": "Edit",
+      "Sold": "Sold",
+      "Reviews": "reviews",
+      "Rating": "Rating"
+    }
+  },
+  "TagProducts": {
+    "BackToTags": "Back to Tags",
+    "TagTitle": "Tag: {tag}",
+    "TagDescription": "All products with this tag",
+    "NoProductsFound": "No products found",
+    "NoProductsDescription": "There are no published products with this tag yet.",
+    "ShowingProducts": "Showing {start} - {end} of {total} products",
+    "SortBy": "Sort by:",
+    "SortPlaceholder": "Select sort option",
+    "SortOptions": {
+      "latest": "Newest",
+      "best-selling": "Best Selling",
+      "price-low-to-high": "Price: Low to High",
+      "price-high-to-low": "Price: High to Low",
+      "avg-customer-review": "Highest Rated"
+    },
+    "PageInfo": "Page {current} of {total}",
+    "Previous": "Previous",
+    "Next": "Next",
+    "Product": {
+      "InStock": "In Stock",
+      "OutOfStock": "Out of Stock",
+      "View": "View",
+      "Edit": "Edit",
+      "Sold": "Sold",
+      "Reviews": "reviews"
+    }
+  },
+  
+  "Categories": {
+      "Title": "Categories Management",
+      "Subtitle": "Manage your product categories",
+      "AddCategory": "Add Category",
+      "SearchPlaceholder": "Search categories...",
+      "TotalCategories": "Total: {count} categories",
+      "NoResults": "No categories found matching your search.",
+      "NoCategories": "No categories found.",
+      "CreateFirstCategory": "Create your first category",
+      "NoDescription": "No description",
+      "Inactive": "Inactive",
+      "View": "View",
+      "Edit": "Edit",
+      "Delete": "Delete",
+      "DeleteTitle": "Delete Category",
+      "DeleteMessage": "Are you sure you want to delete <strong>{name}</strong>? This action cannot be undone and will fail if there are products using this category.",
+      "CreateNewCategory": "Create New Category",
+      "AddNewProductCategory": "Add a new product category",
+      "CategoryName": "Category Name",
+      "CategoryNameRequired": "Category name is required",
+      "Slug": "Slug",
+      "Description": "Description",
+      "CategorySettings": "Category Settings",
+      "Active": "Active",
+      "Creating": "Creating...",
+      "CreateCategory": "Create Category",
+      "Cancel": "Cancel",
+        "BackToCategories": "Back to Categories",
+      "EditCategory": "Edit Category",
+      "UpdateInfo": "Update category information",
+      "CategoryInformation": "Category Information",
+      "NameLabel": "Category Name",
+      "NamePlaceholder": "Enter category name",
+      "SlugLabel": "Slug",
+      "SlugPlaceholder": "category-slug",
+      "SlugDescription": "URL-friendly version of the name. Auto-generated from name.",
+      "DescriptionLabel": "Description",
+      "DescriptionPlaceholder": "Enter category description",
+      "SettingsTitle": "Category Settings",
+      "ActiveLabel": "Active",
+      "ActiveDescription": "Active categories will be visible to customers",
+      "UpdateButton": "Update Category",
+      "CancelButton": "Cancel",
+      "Updating": "Updating...",
+      "Loading": "Loading...",
+      "TableHeaders": {
+        "Name": "Name",
+        "Slug": "Slug",
+        "Description": "Description",
+        "Status": "Status",
+        "Created": "Created",
+        "Actions": "Actions"
+      },
+      "Placeholders": {
+        "CategoryName": "Enter category name",
+        "Slug": "category-slug",
+        "Description": "Enter category description"
+      },
+      "Messages": {
+        "FetchError": "Failed to fetch categories",
+        "DeleteSuccess": "Category deleted successfully",
+        "DeleteError": "Failed to delete category",
+        "CategoryNameRequired": "Category name is required",
+        "CategoryCreated": "Category created successfully",
+        "CategoryCreateFailed": "Failed to create category",
+        "ErrorCreatingCategory": "Error creating category",
+        "FetchCategoryError": "Failed to fetch category",
+        "FetchProductsError": "Failed to fetch products",
+        "LoadError": "Error loading category",
+        "NameRequired": "Category name is required",
+        "UpdateSuccess": "Category updated successfully",
+        "UpdateError": "Error updating category"
+      },
+      "Detail": {
+        "Title": "Category Details",
+        "CategoryNotFound": "Category Not Found",
+        "EditCategory": "Edit Category",
+        "Name": "Name",
+        "NoDescription": "No description provided",
+        "ProductsInCategory": "Products in this Category ({count})",
+        "ProductName": "Name",
+        "Price": "Price",
+        "Stock": "Stock",
+        "Published": "Published",
+        "LastUpdate": "Last Update",
+        "Previous": "Previous",
+        "Next": "Next",
+        "PageInfo": "Page {current} of {total}",
+        "StatusMetadata": "Status & Metadata",
+        "Status": "Status",
+        "CategoryID": "Category ID",
+        "Created": "Created",
+        "LastUpdated": "Last Updated",
+        "Yes": "Yes",
+        "No": "No",
+        "Loading": "Loading..."
+      }
+    },
+  "Nav": {
+    "Overview": "Overview",
+    "Products": "Products",
+    "Categories": "Categories",
+    "BrandsTags": "Brands & Tags",
+    "Orders": "Orders",
+    "Users": "Users",
+    "Carousel": "Carousel",
+    "Pages": "Pages",
+    "Settings": "Settings"
+  },
+   "Products": {
+      "Name": "Product Name",
+      "Slug": "URL Slug",
+      "Category": "Category",
+      "Brand": "Brand",
+      "ListPrice": "List Price",
+      "NetPrice": "Net Price",
+      "CountInStock": "Stock Count",
+      "Images": "Product Images",
+      "Tags": "Tags",
+      "Colors": "Colors",
+      "Sizes": "Sizes",
+      "Description": "Description",
+      "PublishProduct": "Publish Product",
+      "PublishDescription": "Make this product visible to customers",
+      "Product": "Product",
+      "Generate": "Generate",
+      "Submitting": "Submitting...",
+      "BasicInformation": "Basic Information",
+      "VariantsAndStock": "Variants & Stock",
+      "StockSummary": "Stock Summary",
+      "TotalStock": "Total Stock",
+      "Variants": "Variants",
+      "SelectColorToManage": "Select Color to Manage",
+      "Managing": "Managing {color}",
+      "ImagesFor": "Images for {color}",
+      "StockBySize": "Stock by Size",
+      "VariantTotal": "Variant Total: {total}",
+      "Saving": "Saving...",
+      "SaveVariant": "Save Variant",
+      "ExistingVariants": "Existing Variants",
+      "Edit": "Edit",
+      "ItemCount": "{count} items",
+      "RemoveItem": "Remove {item}",
+      "ImageCount": "{count} images",
+      "StockAutoCalculated": "Stock is automatically calculated from variants",
+      "VariantInfo": "{images} images, {stock} stock",
+      "Placeholders": {
+        "Name": "Enter product name",
+        "Slug": "product-url-slug",
+        "Brand": "Enter brand name",
+        "ListPrice": "0.00",
+        "Price": "0.00",
+        "CountInStock": "0",
+        "Tags": "Add a tag",
+        "Colors": "Add a color",
+        "Sizes": "Add a size",
+        "Description": "Enter product description"
+      },
+      "Messages": {
+        "ProductCreated": "Product created successfully",
+        "ProductUpdated": "Product updated successfully",
+        "ImageUploaded": "Image uploaded successfully",
+        "VariantImageUploaded": "Variant image uploaded successfully",
+        "SelectColor": "Please select a color first",
+        "VariantSaved": "Variant saved successfully",
+        "VariantSaveFailed": "Failed to save variant",
+        "AddColorsFirst": "Please add colors to the product first before managing variants"
+      }
+    },
+    "orders": {
+      "title": "Orders Management",
+      "id": "ID",
+      "date": "Date",
+      "buyer": "Buyer",
+      "status": "Status",
+      "total": "Total",
+      "paid": "Paid",
+      "delivered": "Delivered",
+      "actions": "Actions",
+      "noOrders": "No orders found",
+      "deletedUser": "Deleted User",
+      "details": "Details",
+      "adminPermissionRequired": "Admin permission required",
+      "deleteSuccess": "Order deleted successfully",
+      "deleteConfirm": "Are you sure you want to delete this order?",
+      "statuses": {
+        "Pending": "Pending",
+        "Processing": "Processing",
+        "Delivered": "Delivered",
+        "Cancelled": "Cancelled"
+      },
+      "no": "No",
+      "yes": "Yes"
+    }
+    
 
   },
   "Wishlist": {
@@ -289,10 +551,12 @@
     "and": "and",
     "Privacy Notice": "Privacy Notice",
     "Already have an account?": "Already have an account?",
-    "Sign in": "Sign in"
+    "Sign in": "Sign in",
+    "Email account already in use": "Email account already in use"
   },
   "Account": {
     "Your Account": "Your Account",
+    "Status": "Status",
     "Login & Security": "Login & Security",
     "Your Orders": "Your Orders",
     "Manage Addresses": "Manage Addresses",
@@ -309,7 +573,6 @@
     "Edit":"Edit",
     "will be implemented in the next version": "will be implemented in the next version",
     "Password": "Password",
-    "Your Orders": "Your Orders",
     "Order": "Order",
     "Date": "Date",
     "Total": "Total",
@@ -431,6 +694,99 @@
     "Your address": "Your address",
     "Choose a payment method": "Choose a payment method",
     "Shipping Address": "Shipping Address",
-    "View Order": "View Order"
+    "View Order": "View Order",
+    "Footer": {
+    "NeedHelp": "Need help? Check our <helpLink>Help Center</helpLink> or <contactLink>Contact Us</contactLink>",
+    "OrderTerms": "For an item ordered from {siteName}: When you click the 'Place Your Order' button, we will send you an e-mail acknowledging receipt of your order. Your contract to purchase an item will not be complete until we send you an e-mail notifying you that the item has been shipped to you. By placing your order, you agree to {siteName}'s <privacyLink>privacy notice</privacyLink> and <termsLink>conditions of use</termsLink>.",
+    "ReturnPolicy": "Within 30 days of delivery, you may return new, unopened merchandise in its original condition. Exceptions and restrictions apply. <returnLink>See {siteName}'s Returns Policy.</returnLink>"
+    }
+  },
+  "BrandsTags": {
+    "Title": "Brands & Tags Management",
+    "Description": "View and manage product brands and tags",
+    "TotalBrands": "Total Brands",
+    "ActiveBrands": "Active brands",
+    "TotalTags": "Total Tags",
+    "TagsInUse": "Tags in use",
+    "FailedToLoadStatistics": "Failed to load statistics",
+    "FailedToLoadBrands": "Failed to load brands list",
+    "FailedToLoadTags": "Failed to load tags list",
+    "Products": "products",
+    "Sold": "Sold",
+    "AvgRating": "Avg Rating",
+    "ViewProducts": "View products",
+    "Brands": "Brands",
+    "Tags": "Tags"
+  },
+  "Order": {
+    "shippingAddress": "Shipping Address",
+    "paymentMethod": "Payment Method",
+    "orderItems": "Order Items",
+    "orderSummary": "Order Summary",
+    "table": {
+      "item": "Item",
+      "quantity": "Quantity",
+      "color": "Color",
+      "size": "Size",
+      "price": "Price"
+    },
+    "summary": {
+      "items": "Items",
+      "tax": "Tax",
+      "shipping": "Shipping",
+      "total": "Total"
+    },
+    "status": {
+      "cancelled": "CANCELLED (by {by})",
+      "byAdmin": "Admin",
+      "byYou": "Customer",
+      "cancelledAt": "Cancelled at {date}",
+      "delivered": "DELIVERED",
+      "deliveredAt": "Delivered at {date}",
+      "processing": "PROCESSING",
+      "expectedDelivery": "Expected delivery at {date}",
+      "pending": "PENDING",
+      "waitingPayment": "Waiting for payment confirmation"
+    },
+    "payment": {
+      "paidAt": "Paid at {date}",
+      "notPaid": "Not paid"
+    },
+    "actions": {
+      "payOrder": "Pay Order",
+      "markAsPaid": "Mark as paid",
+      "markAsDelivered": "Mark as delivered",
+      "cancelOrder": "Cancel Order",
+      "cancelOrderAdmin": "Cancel Order (Admin)"
+    },
+    "cancelConfirm": {
+      "title": "Are you sure?",
+      "paidMessage": "This order has been paid. Cancelling will require a refund.",
+      "unpaidMessage": "This action cannot be undone. The order will be cancelled.",
+      "cancelButton": "Cancel",
+      "confirmButton": "Confirm Cancel",
+      "cancelling": "Cancelling..."
+    },
+    "cancelSuccess": "Order has been cancelled",
+    "cancelError": "Failed to cancel order"
+  },
+  "OrderStatus": {
+    "Cancelled": "Cancelled",
+    "Delivered": "Delivered",
+    "Processing": "Processing",
+    "Pending": "Pending"
+  },
+  "Sort": {
+    "PriceLowToHigh": "Price: Low to high",
+    "PriceHighToLow": "Price: High to low",
+    "NewestArrivals": "Newest arrivals",
+    "AvgCustomerReview": "Avg. customer review",
+    "BestSelling": "Best selling"
+  },
+  "Price": {
+    "Range1": "$1 to $20",
+    "Range2": "$21 to $50",
+    "Range3": "$51 to $1000"
   }
+
 }

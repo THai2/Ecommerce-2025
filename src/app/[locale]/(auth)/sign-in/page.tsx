@@ -10,6 +10,7 @@ import CredentialsSignInForm from './credentials-signin-form'
 import { Button } from '@/components/ui/button'
 import { getSetting } from '@/lib/actions/setting.actions'
 import { getTranslations } from 'next-intl/server'
+import { GoogleSignInForm } from './google-signin-form'
 
 export const metadata: Metadata = {
   title: 'Sign In',
@@ -42,6 +43,7 @@ export default async function SignInPage(props: {
             <CredentialsSignInForm />
             <SeparatorWithOr />
             <div className='mt-4'>
+               <GoogleSignInForm />
             </div>
           </div>
         </CardContent>
